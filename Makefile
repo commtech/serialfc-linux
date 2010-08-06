@@ -1,8 +1,8 @@
-obj-m 	:= async-loader.o
+obj-m 	:= aloader.o
 KDIR	:= /lib/modules/$(shell uname -r)/build
 PWD	:= $(shell pwd)
 IGNORE	:=
-async-loader-objs := main.o
+aloader-objs := main.o
 	
 default:
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules

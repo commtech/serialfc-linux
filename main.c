@@ -33,7 +33,8 @@
 #define SFSCC_4_LVDS_ID 0x001c
 #define SFSCCe_4_ID 0x001e
 
-#define DEVICE_NAME "fscc"
+#define DEVICE_NAME "aloader"
+#define FCR_OFFSET 0x00
 
 #define return_if_untrue(expr) \
 	if (expr) {} else \
@@ -48,11 +49,14 @@
 		printk(KERN_ERR DEVICE_NAME " %s %s\n", #expr, "is untrue."); \
 		return val; \
 	}
+	
+unsigned init = 1;
 
 struct fscc_card {
 	struct list_head list;
 	struct pci_dev *pci_dev;
 	struct serial_private *serial_priv;
+	void __iomem *bar[3];
 };
 
 struct fscc_card *fscc_card_new(struct pci_dev *pdev,
@@ -65,7 +69,7 @@ struct fscc_card *fscc_card_find(struct pci_dev *pdev,
 
 LIST_HEAD(fscc_cards);
 
-struct pci_device_id fscc_id_table[] __devinitdata = {
+struct pci_device_id aloader_id_table[] __devinitdata = {
 	{ COMMTECH_VENDOR_ID, FSCC_ID, PCI_ANY_ID, 0, 0, 0 },
 	{ COMMTECH_VENDOR_ID, FSCC_232_ID, PCI_ANY_ID, 0, 0, 0 },
 	{ COMMTECH_VENDOR_ID, FSCC_4_ID, PCI_ANY_ID, 0, 0, 0 },
@@ -76,8 +80,8 @@ struct pci_device_id fscc_id_table[] __devinitdata = {
 	{ 0, },
 };
 
-static int __devinit fscc_probe(struct pci_dev *pdev, 
-                                const struct pci_device_id *id)
+static int __devinit aloader_probe(struct pci_dev *pdev, 
+                                   const struct pci_device_id *id)
 {
 	struct fscc_card *new_card = 0;
 	
@@ -91,7 +95,7 @@ static int __devinit fscc_probe(struct pci_dev *pdev,
 	case SFSCC_ID:
 	case SFSCC_4_ID:
 	case SFSCC_4_LVDS_ID:
-	case SFSCCe_4_ID:		
+	case SFSCCe_4_ID:
 		new_card = fscc_card_new(pdev, id);
 		
 		if (new_card)                         
@@ -106,7 +110,7 @@ static int __devinit fscc_probe(struct pci_dev *pdev,
 	return 0;
 }
 
-static void __devexit fscc_remove(struct pci_dev *pdev)
+static void __devexit aloader_remove(struct pci_dev *pdev)
 {
 	struct fscc_card *card = 0;
 	
@@ -117,21 +121,22 @@ static void __devexit fscc_remove(struct pci_dev *pdev)
 	
 	list_del(&card->list);
 	fscc_card_delete(card);	
+	
 	pci_disable_device(pdev);
 }
 
-struct pci_driver fscc_pci_driver = {
-	.name = "fscc",
-	.probe = fscc_probe,
-	.remove = fscc_remove,
-	.id_table = fscc_id_table,
+struct pci_driver aloader_pci_driver = {
+	.name = DEVICE_NAME,
+	.probe = aloader_probe,
+	.remove = aloader_remove,
+	.id_table = aloader_id_table,
 };
 
-static int __init fscc_init(void)
+static int __init aloader_init(void)
 {
 	unsigned err;
 	
-	err = pci_register_driver(&fscc_pci_driver);
+	err = pci_register_driver(&aloader_pci_driver);
 	
 	if (err < 0) {
 		printk(KERN_ERR DEVICE_NAME " pci_register_driver failed");
@@ -141,22 +146,23 @@ static int __init fscc_init(void)
 	return 0;
 }
 
-static void __exit fscc_exit(void)
+static void __exit aloader_exit(void)
 {
-	pci_unregister_driver(&fscc_pci_driver);
+	pci_unregister_driver(&aloader_pci_driver);
 }
 
 struct pciserial_board pci_board = {
 	.flags = FL_BASE1,
 	.num_ports = 2,
 	.base_baud = 921600,
-	.uart_offset = 8,
+	.uart_offset = 0x8,
 };
 
 struct fscc_card *fscc_card_new(struct pci_dev *pdev,
                                 const struct pci_device_id *id)
 {
 	struct fscc_card *card = 0;
+	unsigned i = 0;
 	
 	card = kmalloc(sizeof(*card), GFP_KERNEL);
 	
@@ -176,6 +182,18 @@ struct fscc_card *fscc_card_new(struct pci_dev *pdev,
 	}
 	
 	pci_set_drvdata(pdev, card->serial_priv);
+	
+	for (i = 0; i < 3; i++) {
+		card->bar[i] = pci_iomap(card->pci_dev, i, 0);
+		
+		if (card->bar[i] == NULL) {
+			dev_err(&card->pci_dev->dev, "pci_iomap failed on bar #%i\n", i);			       
+			return 0;
+		}
+	}
+	
+	if (init)
+		iowrite32(0x03000000, card->bar[2] + FCR_OFFSET);
 	
 	return card;
 }
@@ -206,7 +224,7 @@ struct fscc_card *fscc_card_find(struct pci_dev *pdev,
 	return 0;
 }
 
-MODULE_DEVICE_TABLE(pci, fscc_id_table);
+MODULE_DEVICE_TABLE(pci, aloader_id_table);
 
 MODULE_LICENSE("GPL");
 MODULE_VERSION("1.0");
@@ -214,6 +232,9 @@ MODULE_AUTHOR("William Fagan <willf@commtech-fastcom.com>");
 
 MODULE_DESCRIPTION("Registers the async ports with the serial driver for the FSCC series of cards."); 
 
-module_init(fscc_init);
-module_exit(fscc_exit); 
+module_param(init, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+MODULE_PARM_DESC(init, "Whether or not to init the ports for asynchronous communication (FCR = 0x03000000).");
+
+module_init(aloader_init);
+module_exit(aloader_exit); 
  
