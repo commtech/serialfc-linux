@@ -1,0 +1,9 @@
+syntax: glob
+
+*.cmd
+*.mod
+*.symvers
+*.ko
+*.mod.*
+*.o
+*.order
