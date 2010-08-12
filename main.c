@@ -59,8 +59,7 @@ struct fscc_card {
 	void __iomem *bar[3];
 };
 
-struct fscc_card *fscc_card_new(struct pci_dev *pdev,
-                                const struct pci_device_id *id);
+struct fscc_card *fscc_card_new(struct pci_dev *pdev);
                                 
 void fscc_card_delete(struct fscc_card *card);
 
@@ -88,24 +87,10 @@ static int __devinit aloader_probe(struct pci_dev *pdev,
 	if (pci_enable_device(pdev))
 		return -EIO;
 	
-	switch (id->device) {
-	case FSCC_ID:			
-	case FSCC_232_ID:
-	case FSCC_4_ID:
-	case SFSCC_ID:
-	case SFSCC_4_ID:
-	case SFSCC_4_LVDS_ID:
-	case SFSCCe_4_ID:
-		new_card = fscc_card_new(pdev, id);
+	new_card = fscc_card_new(pdev);
 		
-		if (new_card)                         
-			list_add_tail(&new_card->list, &fscc_cards);
-				
-		break;
-			
-	default:
-		printk(KERN_DEBUG DEVICE_NAME " unknown device\n");
-	}
+	if (new_card)                         
+		list_add_tail(&new_card->list, &fscc_cards);
 
 	return 0;
 }
@@ -134,13 +119,13 @@ struct pci_driver aloader_pci_driver = {
 
 static int __init aloader_init(void)
 {
-	unsigned err;
+	unsigned error_code = 0;
 	
-	err = pci_register_driver(&aloader_pci_driver);
+	error_code = pci_register_driver(&aloader_pci_driver);
 	
-	if (err < 0) {
+	if (error_code < 0) {
 		printk(KERN_ERR DEVICE_NAME " pci_register_driver failed");
-		return err;
+		return error_code;
 	}
 	
 	return 0;
@@ -158,8 +143,7 @@ struct pciserial_board pci_board = {
 	.uart_offset = 0x8,
 };
 
-struct fscc_card *fscc_card_new(struct pci_dev *pdev,
-                                const struct pci_device_id *id)
+struct fscc_card *fscc_card_new(struct pci_dev *pdev)
 {
 	struct fscc_card *card = 0;
 	unsigned i = 0;
