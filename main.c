@@ -232,7 +232,7 @@ struct pciserial_board fc335_2_pci_board = {
 
 struct pciserial_board fc335_4_pci_board = {
 	.flags = FL_BASE0,
-	.num_ports = 2,
+	.num_ports = 4,
 	.base_baud = 1152000,
 	.uart_offset = 0x200,
 };
