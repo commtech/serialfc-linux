@@ -28,6 +28,7 @@
 #define FC_422_2_335_ID 0x0004
 #define FC_422_4_335_ID 0x0002
 #define FC_232_4_335_ID 0x000a
+#define FC_232_8_335_ID 0x000b
 
 #define FSCC_ID 0x000f
 #define SFSCC_ID 0x0014
@@ -108,6 +109,7 @@ struct pci_device_id fc335_id_table[] __devinitdata = {
 	{ COMMTECH_VENDOR_ID, FC_422_2_335_ID, PCI_ANY_ID, 0, 0, 0 },
 	{ COMMTECH_VENDOR_ID, FC_422_4_335_ID, PCI_ANY_ID, 0, 0, 0 },
 	{ COMMTECH_VENDOR_ID, FC_232_4_335_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, FC_232_8_335_ID, PCI_ANY_ID, 0, 0, 0 },
 	{ 0, },
 };
 
@@ -235,6 +237,13 @@ struct pciserial_board fc335_4_pci_board = {
 	.uart_offset = 0x200,
 };
 
+struct pciserial_board fc335_8_pci_board = {
+	.flags = FL_BASE0,
+	.num_ports = 8,
+	.base_baud = 1152000,
+	.uart_offset = 0x200,
+};
+
 struct fscc_card *fscc_card_new(struct pci_dev *pdev)
 {
 	struct fscc_card *card = 0;
@@ -295,6 +304,10 @@ struct fc335_card *fc335_card_new(struct pci_dev *pdev)
 	case FC_232_4_335_ID:
 		card->serial_priv = pciserial_init_ports(pdev, &fc335_4_pci_board);
 		break;
+
+	case FC_232_8_335_ID:
+		card->serial_priv = pciserial_init_ports(pdev, &fc335_8_pci_board);
+		break;
 	}	
 
 	if (IS_ERR(card->serial_priv)) {
@@ -326,6 +339,7 @@ struct fc335_card *fc335_card_new(struct pci_dev *pdev)
 		break;
 		
 	case FC_232_4_335_ID:
+	case FC_232_8_335_ID:
 		iowrite8(0xc0, card->bar[0] + MPIOSEL_OFFSET);
 		udelay(20);
 		iowrite8(0xc0, card->bar[0] + MPIOINV_OFFSET);
