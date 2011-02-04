@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2010  Commtech, Inc.
+	Copyright (C) 2011  Commtech, Inc.
 	
 	This file is part of fscc-linux.
 
@@ -38,7 +38,7 @@
 #define SFSCC_4_LVDS_ID 0x001c
 #define SFSCCe_4_ID 0x001e
 
-#define DEVICE_NAME "aloader"
+#define DEVICE_NAME "fc-async"
 #define FCR_OFFSET 0x00
 	
 #define MPIOSEL_OFFSET 0x93
@@ -189,7 +189,7 @@ struct pci_driver fc335_pci_driver = {
 	.id_table = fc335_id_table,
 };
 
-static int __init aloader_init(void)
+static int __init fc_async_init(void)
 {
 	unsigned error_code = 0;
 	
@@ -210,7 +210,7 @@ static int __init aloader_init(void)
 	return 0;
 }
 
-static void __exit aloader_exit(void)
+static void __exit fc_async_exit(void)
 {
 	pci_unregister_driver(&fscc_pci_driver);
 	pci_unregister_driver(&fc335_pci_driver);
@@ -408,17 +408,16 @@ struct fc335_card *fc335_card_find(struct pci_dev *pdev,
 	return 0;
 }
 
-//MODULE_DEVICE_TABLE(pci, aloader_id_table);
-
 MODULE_LICENSE("GPL");
 MODULE_VERSION("1.0");
 MODULE_AUTHOR("William Fagan <willf@commtech-fastcom.com>");
 
-MODULE_DESCRIPTION("Registers the async ports with the serial driver for the FSCC series of cards."); 
+MODULE_DESCRIPTION("Registers the UARTs on the FSCC and 335 series of Commtech \
+                    cards with the serial driver."); 
 
 module_param(init, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-MODULE_PARM_DESC(init, "Whether or not to init the ports for asynchronous communication (FCR = 0x03000000).");
+MODULE_PARM_DESC(init, "Whether or not to initialize FSCC ports for \
+                        asynchronous communication (FCR = 0x03000000).");
 
-module_init(aloader_init);
-module_exit(aloader_exit); 
- 
+module_init(fc_async_init);
+module_exit(fc_async_exit); 
