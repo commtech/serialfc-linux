@@ -41,9 +41,9 @@ architecture.
 1.2 If you would like to keep up with the most recent changes, you may always 
     obtain the latest source for fc-async from the Google Code repo found at: 
 
-        http://code.google.com/p/fc-async
+        http://hg.commtech-fastcom.com/fc-async
 
     Alternatitively you can clone the repo using Mercurial:
 
-        hg clone https://fc-async.googlecode.com/hg/ fc-async
+        hg clone http://hg.commtech-fastcom.com/fc-async fc-async
 
