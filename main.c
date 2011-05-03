@@ -223,7 +223,7 @@ static void __exit fc_async_exit(void)
 struct pciserial_board fscc_pci_board = {
 	.flags = FL_BASE1,
 	.num_ports = 2,
-	.base_baud = 921600,
+	.base_baud = 1500000,
 	.uart_offset = 0x8,
 };
 
