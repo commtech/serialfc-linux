@@ -413,7 +413,7 @@ struct fc335_card *fc335_card_find(struct pci_dev *pdev,
 }
 
 MODULE_LICENSE("GPL");
-MODULE_VERSION("1.0.0");
+MODULE_VERSION("1.0.1");
 MODULE_AUTHOR("William Fagan <willf@commtech-fastcom.com>");
 
 MODULE_DESCRIPTION("Registers the UARTs on the FSCC and 335 series of Commtech "\
