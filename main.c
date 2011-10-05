@@ -22,6 +22,7 @@
 #include <linux/pci.h> /* struct pci_dev */
 #include <linux/fs.h> /* struct file_operations */
 #include <linux/8250_pci.h> /* struct serial_private */
+#include <linux/delay.h> /* udelay */
 
 #define COMMTECH_VENDOR_ID 0x18f7
 
