@@ -1,8 +1,8 @@
-obj-m 	:= fc-async.o
+obj-m 	:= fc335.o
 KDIR	:= /lib/modules/$(shell uname -r)/build
 PWD	:= $(shell pwd)
 IGNORE	:=
-fc-async-objs := main.o
+fc335-objs := main.o
 	
 default:
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules
