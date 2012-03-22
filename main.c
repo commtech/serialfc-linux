@@ -53,8 +53,6 @@
 		return val; \
 	}
 
-unsigned init = 1;
-
 struct fc335_card {
 	struct list_head list;
 	struct pci_dev *pci_dev;
