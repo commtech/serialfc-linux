@@ -5,11 +5,11 @@ architecture.
     the whole thing.  Now we have a kernel module that will attach all of our
     current Async ports to the default Linux serial driver.
 
-    To use this kernel module simply change to the fc-async directory and 
+    To use this kernel module simply change to the fc335-linux directory and 
     type:
 
         make
-        sudo insmod fc-async.ko
+        sudo insmod fc335-linux.ko
 
     You can verify that the new ports were detected by checking the message log
 
@@ -39,11 +39,11 @@ architecture.
     lines modified appropriately.  
 
 1.2 If you would like to keep up with the most recent changes, you may always 
-    obtain the latest source for fc-async from the Google Code repo found at: 
+    obtain the latest source for fc335-linux from the Google Code repo found at: 
 
-        http://hg.commtech-fastcom.com/fc-async
+        http://hg.commtech-fastcom.com/fc335-linux
 
-    Alternatitively you can clone the repo using Mercurial:
+    Alternatively you can clone the repo using Mercurial:
 
-        hg clone http://hg.commtech-fastcom.com/fc-async fc-async
+        hg clone http://hg.commtech-fastcom.com/fc335-linux
 
