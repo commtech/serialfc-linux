@@ -37,7 +37,7 @@
 #define MPIOINV_OFFSET 0x92
 #define MPIO3T_OFFSET 0x91
 #define MPIOLVL_OFFSET 0x90
-#define MPIOINT_OFFSET 0x89
+#define MPIOINT_OFFSET 0x8f
 
 #define return_if_untrue(expr) \
 	if (expr) {} else \
