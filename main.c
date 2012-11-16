@@ -200,26 +200,18 @@ struct fc335_card *fc335_card_new(struct pci_dev *pdev)
 	case FC_422_2_335_ID:
 	case FC_422_4_335_ID:
 		iowrite8(0x00, card->bar[0] + MPIOSEL_OFFSET);
-		udelay(20);
 		iowrite8(0x00, card->bar[0] + MPIOINV_OFFSET);
-		udelay(20);
 		iowrite8(0x00, card->bar[0] + MPIO3T_OFFSET);
-		udelay(20);
 		iowrite8(0x00, card->bar[0] + MPIOINT_OFFSET);
-		udelay(20);
 		iowrite8(0x78, card->bar[0] + MPIOLVL_OFFSET);
 		break;
 
 	case FC_232_4_335_ID:
 	case FC_232_8_335_ID:
 		iowrite8(0xc0, card->bar[0] + MPIOSEL_OFFSET);
-		udelay(20);
 		iowrite8(0xc0, card->bar[0] + MPIOINV_OFFSET);
-		udelay(20);
 		iowrite8(0x00, card->bar[0] + MPIO3T_OFFSET);
-		udelay(20);
 		iowrite8(0x00, card->bar[0] + MPIOINT_OFFSET);
-		udelay(20);
 		iowrite8(0x00, card->bar[0] + MPIOLVL_OFFSET);
 		break;
 	}
