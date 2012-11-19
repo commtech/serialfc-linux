@@ -26,18 +26,29 @@
 
 #define COMMTECH_VENDOR_ID 0x18f7
 
-#define FC_422_2_335_ID 0x0004
-#define FC_422_4_335_ID 0x0002
-#define FC_232_4_335_ID 0x000a
-#define FC_232_8_335_ID 0x000b
+#define FC_422_2_PCI_ID 0x0004
+#define FC_422_4_PCI_ID 0x0002
+#define FC_232_4_PCI_ID 0x000a
+#define FC_232_8_PCI_ID 0x000b
+#define FC_422_2_PCIe_ID 0x0019
+#define FC_422_4_PCIe_ID 0x0020
+#define FC_422_8_PCIe_ID 0x0021
 
-#define DEVICE_NAME "fc335"
+#define DEVICE_NAME "fc-async"
 
-#define MPIOSEL_OFFSET 0x93
-#define MPIOINV_OFFSET 0x92
-#define MPIO3T_OFFSET 0x91
-#define MPIOLVL_OFFSET 0x90
 #define MPIOINT_OFFSET 0x8f
+#define MPIOLVL_OFFSET 0x90
+#define MPIO3T_OFFSET 0x91
+#define MPIOINV_OFFSET 0x92
+#define MPIOSEL_OFFSET 0x93
+#define MPIOOD_OFFSET 0x94
+
+#define MPIOINTH_OFFSET 0x95
+#define MPIOLVLH_OFFSET 0x96
+#define MPIO3TH_OFFSET 0x97
+#define MPIOINVH_OFFSET 0x98
+#define MPIOSELH_OFFSET 0x99
+#define MPIOODH_OFFSET 0x9a
 
 #define return_if_untrue(expr) \
 	if (expr) {} else \
@@ -53,73 +64,76 @@
 		return val; \
 	}
 
-struct fc335_card {
+struct fc_card {
 	struct list_head list;
 	struct pci_dev *pci_dev;
 	struct serial_private *serial_priv;
 	void __iomem *bar[1];
 };
 
-struct fc335_card *fc335_card_new(struct pci_dev *pdev);
+struct fc_card *fc_card_new(struct pci_dev *pdev);
 
-void fc335_card_delete(struct fc335_card *card);
+void fc_card_delete(struct fc_card *card);
 
-struct fc335_card *fc335_card_find(struct pci_dev *pdev,
+struct fc_card *fc_card_find(struct pci_dev *pdev,
                                    struct list_head *card_list);
 
-LIST_HEAD(fc335_cards);
+LIST_HEAD(fc_cards);
 
-struct pci_device_id fc335_id_table[] __devinitdata = {
-	{ COMMTECH_VENDOR_ID, FC_422_2_335_ID, PCI_ANY_ID, 0, 0, 0 },
-	{ COMMTECH_VENDOR_ID, FC_422_4_335_ID, PCI_ANY_ID, 0, 0, 0 },
-	{ COMMTECH_VENDOR_ID, FC_232_4_335_ID, PCI_ANY_ID, 0, 0, 0 },
-	{ COMMTECH_VENDOR_ID, FC_232_8_335_ID, PCI_ANY_ID, 0, 0, 0 },
+struct pci_device_id fc_id_table[] __devinitdata = {
+	{ COMMTECH_VENDOR_ID, FC_422_2_PCI_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, FC_422_4_PCI_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, FC_232_4_PCI_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, FC_232_8_PCI_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, FC_422_2_PCIe_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, FC_422_4_PCIe_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, FC_422_8_PCIe_ID, PCI_ANY_ID, 0, 0, 0 },
 	{ 0, },
 };
 
-static int __devinit fc335_probe(struct pci_dev *pdev,
+static int __devinit fc_probe(struct pci_dev *pdev,
                                    const struct pci_device_id *id)
 {
-	struct fc335_card *new_card = 0;
+	struct fc_card *new_card = 0;
 
 	if (pci_enable_device(pdev))
 		return -EIO;
 
-	new_card = fc335_card_new(pdev);
+	new_card = fc_card_new(pdev);
 
 	if (new_card)
-		list_add_tail(&new_card->list, &fc335_cards);
+		list_add_tail(&new_card->list, &fc_cards);
 
 	return 0;
 }
 
-static void __devexit fc335_remove(struct pci_dev *pdev)
+static void __devexit fc_remove(struct pci_dev *pdev)
 {
-	struct fc335_card *card = 0;
+	struct fc_card *card = 0;
 
-	card = fc335_card_find(pdev, &fc335_cards);
+	card = fc_card_find(pdev, &fc_cards);
 
 	if (card == 0)
 		return;
 
 	list_del(&card->list);
-	fc335_card_delete(card);
+	fc_card_delete(card);
 
 	pci_disable_device(pdev);
 }
 
-struct pci_driver fc335_pci_driver = {
+struct pci_driver fc_pci_driver = {
 	.name = DEVICE_NAME,
-	.probe = fc335_probe,
-	.remove = fc335_remove,
-	.id_table = fc335_id_table,
+	.probe = fc_probe,
+	.remove = fc_remove,
+	.id_table = fc_id_table,
 };
 
-static int __init fc335_init(void)
+static int __init fc_init(void)
 {
 	unsigned error_code = 0;
 
-	error_code = pci_register_driver(&fc335_pci_driver);
+	error_code = pci_register_driver(&fc_pci_driver);
 
 	if (error_code < 0) {
 		printk(KERN_ERR DEVICE_NAME " pci_register_driver failed");
@@ -129,35 +143,63 @@ static int __init fc335_init(void)
 	return 0;
 }
 
-static void __exit fc335_exit(void)
+static void __exit fc_exit(void)
 {
-	pci_unregister_driver(&fc335_pci_driver);
+	pci_unregister_driver(&fc_pci_driver);
 }
 
-struct pciserial_board fc335_2_pci_board = {
+struct pciserial_board fc_2_pci_board = {
 	.flags = FL_BASE0,
 	.num_ports = 2,
 	.base_baud = 1152000,
 	.uart_offset = 0x200,
 };
 
-struct pciserial_board fc335_4_pci_board = {
+struct pciserial_board fc_4_pci_board = {
 	.flags = FL_BASE0,
 	.num_ports = 4,
 	.base_baud = 1152000,
 	.uart_offset = 0x200,
 };
 
-struct pciserial_board fc335_8_pci_board = {
+struct pciserial_board fc_8_pci_board = {
 	.flags = FL_BASE0,
 	.num_ports = 8,
 	.base_baud = 1152000,
 	.uart_offset = 0x200,
 };
 
-struct fc335_card *fc335_card_new(struct pci_dev *pdev)
+struct pciserial_board fc_2_pcie_board = {
+	.flags = FL_BASE0,
+	.num_ports = 2,
+	.base_baud = 7812500,
+	.uart_offset = 0x400,
+	.reg_shift = 0,
+	.first_offset = 0,
+};
+
+struct pciserial_board fc_4_pcie_board = {
+	.flags = FL_BASE0,
+	.num_ports = 2,
+	.base_baud = 7812500,
+	.uart_offset = 0x400,
+	.reg_shift = 0,
+	.first_offset = 0,
+};
+
+struct pciserial_board fc_8_pcie_board = {
+	.flags = FL_BASE0,
+	.num_ports = 2,
+	.base_baud = 7812500,
+	.uart_offset = 0x400,
+	.reg_shift = 0,
+	.first_offset = 0,
+};
+
+
+struct fc_card *fc_card_new(struct pci_dev *pdev)
 {
-	struct fc335_card *card = 0;
+	struct fc_card *card = 0;
 	unsigned i = 0;
 
 	card = kmalloc(sizeof(*card), GFP_KERNEL);
@@ -168,17 +210,29 @@ struct fc335_card *fc335_card_new(struct pci_dev *pdev)
 	card->pci_dev = pdev;
 
 	switch (pdev->device) {
-	case FC_422_2_335_ID:
-		card->serial_priv = pciserial_init_ports(pdev, &fc335_2_pci_board);
+	case FC_422_2_PCI_ID:
+		card->serial_priv = pciserial_init_ports(pdev, &fc_2_pci_board);
 		break;
 
-	case FC_422_4_335_ID:
-	case FC_232_4_335_ID:
-		card->serial_priv = pciserial_init_ports(pdev, &fc335_4_pci_board);
+	case FC_422_4_PCI_ID:
+	case FC_232_4_PCI_ID:
+		card->serial_priv = pciserial_init_ports(pdev, &fc_4_pci_board);
 		break;
 
-	case FC_232_8_335_ID:
-		card->serial_priv = pciserial_init_ports(pdev, &fc335_8_pci_board);
+	case FC_232_8_PCI_ID:
+		card->serial_priv = pciserial_init_ports(pdev, &fc_8_pci_board);
+		break;
+
+	case FC_422_2_PCIe_ID:
+		card->serial_priv = pciserial_init_ports(pdev, &fc_2_pcie_board);
+		break;
+
+	case FC_422_4_PCIe_ID:
+		card->serial_priv = pciserial_init_ports(pdev, &fc_4_pcie_board);
+		break;
+
+	case FC_422_8_PCIe_ID:
+		card->serial_priv = pciserial_init_ports(pdev, &fc_8_pcie_board);
 		break;
 	}
 
@@ -197,8 +251,8 @@ struct fc335_card *fc335_card_new(struct pci_dev *pdev)
 	}
 
 	switch (pdev->device) {
-	case FC_422_2_335_ID:
-	case FC_422_4_335_ID:
+	case FC_422_2_PCI_ID:
+	case FC_422_4_PCI_ID:
 		iowrite8(0x00, card->bar[0] + MPIOSEL_OFFSET);
 		iowrite8(0x00, card->bar[0] + MPIOINV_OFFSET);
 		iowrite8(0x00, card->bar[0] + MPIO3T_OFFSET);
@@ -206,20 +260,38 @@ struct fc335_card *fc335_card_new(struct pci_dev *pdev)
 		iowrite8(0x78, card->bar[0] + MPIOLVL_OFFSET);
 		break;
 
-	case FC_232_4_335_ID:
-	case FC_232_8_335_ID:
+	case FC_232_4_PCI_ID:
+	case FC_232_8_PCI_ID:
 		iowrite8(0xc0, card->bar[0] + MPIOSEL_OFFSET);
 		iowrite8(0xc0, card->bar[0] + MPIOINV_OFFSET);
 		iowrite8(0x00, card->bar[0] + MPIO3T_OFFSET);
 		iowrite8(0x00, card->bar[0] + MPIOINT_OFFSET);
 		iowrite8(0x00, card->bar[0] + MPIOLVL_OFFSET);
 		break;
+
+	case FC_422_2_PCIe_ID:
+	case FC_422_4_PCIe_ID:
+	case FC_422_8_PCIe_ID:
+		iowrite8(0x00, card->bar[0] + MPIOINT_OFFSET);
+		iowrite8(0x00, card->bar[0] + MPIOLVL_OFFSET);
+		iowrite8(0x00, card->bar[0] + MPIO3T_OFFSET);
+		iowrite8(0x00, card->bar[0] + MPIOINV_OFFSET);
+		iowrite8(0x00, card->bar[0] + MPIOSEL_OFFSET);
+		iowrite8(0x00, card->bar[0] + MPIOOD_OFFSET);
+
+		iowrite8(0x00, card->bar[0] + MPIOINTH_OFFSET);
+		iowrite8(0x00, card->bar[0] + MPIOLVLH_OFFSET);
+		iowrite8(0x00, card->bar[0] + MPIO3TH_OFFSET);
+		iowrite8(0x00, card->bar[0] + MPIOINVH_OFFSET);
+		iowrite8(0x00, card->bar[0] + MPIOSELH_OFFSET);
+		iowrite8(0x00, card->bar[0] + MPIOODH_OFFSET);
+		break;
 	}
 
 	return card;
 }
 
-void fc335_card_delete(struct fc335_card *card)
+void fc_card_delete(struct fc_card *card)
 {
 	return_if_untrue(card);
 
@@ -229,11 +301,11 @@ void fc335_card_delete(struct fc335_card *card)
 	kfree(card);
 }
 
-struct fc335_card *fc335_card_find(struct pci_dev *pdev,
+struct fc_card *fc_card_find(struct pci_dev *pdev,
                                   struct list_head *card_list)
 
 {
-	struct fc335_card *current_card = 0;
+	struct fc_card *current_card = 0;
 
 	return_val_if_untrue(pdev, 0);
 	return_val_if_untrue(card_list, 0);
@@ -250,8 +322,8 @@ MODULE_LICENSE("GPL");
 MODULE_VERSION("1.0.2");
 MODULE_AUTHOR("William Fagan <willf@commtech-fastcom.com>");
 
-MODULE_DESCRIPTION("Registers the UARTs on the 335 series of Commtech cards "\
+MODULE_DESCRIPTION("Registers the UARTs on the async series of Commtech cards "\
                    "with the serial driver.");
 
-module_init(fc335_init);
-module_exit(fc335_exit);
+module_init(fc_init);
+module_exit(fc_exit);
