@@ -1,0 +1,5 @@
+version 1.1.0 (12/04/2012)
+--------------------------------------------------------------------------------
+	* Added support for the new 422 PCIe cards
+	* Faster loading
+	* Better port initialization
