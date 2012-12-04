@@ -30,7 +30,6 @@
 #define FC_422_4_PCI_ID 0x0002
 #define FC_232_4_PCI_ID 0x000a
 #define FC_232_8_PCI_ID 0x000b
-#define FC_422_2_PCIe_ID 0x0019
 #define FC_422_4_PCIe_ID 0x0020
 #define FC_422_8_PCIe_ID 0x0021
 
