@@ -22,7 +22,6 @@
 #include <linux/pci.h> /* struct pci_dev */
 #include <linux/fs.h> /* struct file_operations */
 #include <linux/8250_pci.h> /* struct serial_private */
-#include <linux/delay.h>
 
 #define COMMTECH_VENDOR_ID 0x18f7
 
@@ -216,7 +215,6 @@ struct pciserial_board fc_8_pcie_board = {
 struct fc_card *fc_pci_card_new(struct pci_dev *pdev)
 {
 	struct fc_card *card = 0;
-	unsigned i = 0;
 
 	card = kmalloc(sizeof(*card), GFP_KERNEL);
 
@@ -250,7 +248,7 @@ struct fc_card *fc_pci_card_new(struct pci_dev *pdev)
 	card->addr = pci_iomap(card->pci_dev, 0, 0);
 
 	if (card->addr == NULL) {
-		dev_err(&card->pci_dev->dev, "pci_iomap failed on bar #%i\n", i);
+		dev_err(&card->pci_dev->dev, "pci_iomap failed\n");
 		return 0;
 	}
 
@@ -315,7 +313,7 @@ struct fc_card *fc_pcie_card_new(struct pci_dev *pdev)
 	card->addr = pci_iomap(card->pci_dev, 0, 0);
 
 	if (card->addr == NULL) {
-		dev_err(&card->pci_dev->dev, "pci_iomap failed on bar #%i\n", i);
+		dev_err(&card->pci_dev->dev, "pci_iomap failed\n");
 		return 0;
 	}
 
