@@ -50,6 +50,11 @@
 #define MPIOSELH_OFFSET 0x99
 #define MPIOODH_OFFSET 0x9a
 
+#define UART_EXAR_8XMODE 0x88    /* 8X sampling rate select */
+#define UART_EXAR_TXTRG 0x0a    /* Tx FIFO trigger level write-only */
+#define UART_EXAR_RXTRG 0x0b    /* Rx FIFO trigger level write-only */
+#define UART_EXAR_FCTR 0x08    /* Feature Control Register */
+
 #define return_if_untrue(expr) \
 	if (expr) {} else \
 	{ \
@@ -180,7 +185,7 @@ struct pciserial_board fc_2_pcie_board = {
 
 struct pciserial_board fc_4_pcie_board = {
 	.flags = FL_BASE0,
-	.num_ports = 2,
+	.num_ports = 4,
 	.base_baud = 7812500,
 	.uart_offset = 0x400,
 	.reg_shift = 0,
@@ -189,7 +194,7 @@ struct pciserial_board fc_4_pcie_board = {
 
 struct pciserial_board fc_8_pcie_board = {
 	.flags = FL_BASE0,
-	.num_ports = 2,
+	.num_ports = 8,
 	.base_baud = 7812500,
 	.uart_offset = 0x400,
 	.reg_shift = 0,
@@ -258,6 +263,7 @@ struct fc_card *fc_card_new(struct pci_dev *pdev)
 		iowrite8(0x00, card->bar[0] + MPIO3T_OFFSET);
 		iowrite8(0x00, card->bar[0] + MPIOINT_OFFSET);
 		iowrite8(0x78, card->bar[0] + MPIOLVL_OFFSET);
+		iowrite8(0x00, card->bar[0] + MPIOOD_OFFSET);
 		break;
 
 	case FC_232_4_PCI_ID:
@@ -267,6 +273,7 @@ struct fc_card *fc_card_new(struct pci_dev *pdev)
 		iowrite8(0x00, card->bar[0] + MPIO3T_OFFSET);
 		iowrite8(0x00, card->bar[0] + MPIOINT_OFFSET);
 		iowrite8(0x00, card->bar[0] + MPIOLVL_OFFSET);
+		iowrite8(0x00, card->bar[0] + MPIOOD_OFFSET);
 		break;
 
 	case FC_422_2_PCIe_ID:
@@ -285,6 +292,11 @@ struct fc_card *fc_card_new(struct pci_dev *pdev)
 		iowrite8(0x00, card->bar[0] + MPIOINVH_OFFSET);
 		iowrite8(0x00, card->bar[0] + MPIOSELH_OFFSET);
 		iowrite8(0x00, card->bar[0] + MPIOODH_OFFSET);
+
+		iowrite8(0x00, card->bar[0] + UART_EXAR_8XMODE);
+		iowrite8(0xc0, card->bar[0] + UART_EXAR_FCTR); /* FIFO trigger table D programmable */
+		iowrite8(128, card->bar[0] + UART_EXAR_TXTRG);
+		iowrite8(128, card->bar[0] + UART_EXAR_RXTRG);
 		break;
 	}
 
