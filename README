@@ -1,24 +1,24 @@
-Installation Instructions for Commtech's Async adapters using the 8250 serial 
+Installation Instructions for Commtech's Async adapters using the 8250 serial
 architecture.
 
 1.0 Gone are the days of applying a patch to the kernel source and rebuilding
     the whole thing.  Now we have a kernel module that will attach all of our
     current Async ports to the default Linux serial driver.
 
-    To use this kernel module simply change to the fc335-linux directory and 
+    To use this kernel module simply change to the serial-fc directory and
     type:
 
         make
-        sudo insmod fc335-linux.ko
+        sudo insmod serial_fc.ko
 
     You can verify that the new ports were detected by checking the message log
 
-        tail /var/log/messages
+        tail /var/log/kern.log
 
     you will see something like one of these:
 
-        ttyS4 at I/O 0xd000 (irq = 177) is a 16C950/954
         ttys5 at MMIO 0xd0004800 (irq = 21) is a 16550A
+		ttyS6 at MMIO 0xfeafc000 (irq = 17) is a ST16650
 
     for each of your newly discovered Fastcom ports.
 
@@ -26,7 +26,7 @@ architecture.
     be that your kernel's defaults are set to only detect a too-small
     number of serial ports.  This can be verified by looking at your
     current configuration file usually found at /boot/config-*
-    Look for the defines for: CONFIG_SERIAL_8250_NR_UARTS & 
+    Look for the defines for: CONFIG_SERIAL_8250_NR_UARTS &
     CONFIG_SERIAL_8250_RUNTIME_UARTS.
 
     If either of these numbers is smaller than the total number of serial ports
@@ -36,14 +36,14 @@ architecture.
     line to say: 8250.nr_uarts=16 (or whatever number you like).
 
     Alternatively you could recompile your kernel with those two config
-    lines modified appropriately.  
+    lines modified appropriately.
 
-1.2 If you would like to keep up with the most recent changes, you may always 
-    obtain the latest source for fc335-linux from the Google Code repo found at: 
+1.2 If you would like to keep up with the most recent changes, you may always
+    obtain the latest source for serial-fc from the Google Code repo found at:
 
-        http://hg.commtech-fastcom.com/fc335-linux
+        http://hg.commtech-fastcom.com/serial-fc
 
     Alternatively you can clone the repo using Mercurial:
 
-        hg clone http://hg.commtech-fastcom.com/fc335-linux
+        hg clone http://hg.commtech-fastcom.com/serial-fc
 

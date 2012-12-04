@@ -1,9 +1,9 @@
-obj-m 	:= fc335.o
+obj-m 	:= serial_fc.o
 KDIR	:= /lib/modules/$(shell uname -r)/build
 PWD	:= $(shell pwd)
 IGNORE	:=
-fc335-objs := main.o
-	
+serial_fc-objs := main.o
+
 default:
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules
 
