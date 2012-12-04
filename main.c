@@ -264,6 +264,11 @@ struct fc_card *fc_card_new(struct pci_dev *pdev)
 		iowrite8(0x00, card->bar[0] + MPIOINT_OFFSET);
 		iowrite8(0x78, card->bar[0] + MPIOLVL_OFFSET);
 		iowrite8(0x00, card->bar[0] + MPIOOD_OFFSET);
+
+		iowrite8(0x00, card->bar[0] + UART_EXAR_8XMODE);
+		iowrite8(0xc0, card->bar[0] + UART_EXAR_FCTR);
+		iowrite8(32, card->bar[0] + UART_EXAR_TXTRG);
+		iowrite8(32, card->bar[0] + UART_EXAR_RXTRG);
 		break;
 
 	case FC_232_4_PCI_ID:
@@ -274,6 +279,11 @@ struct fc_card *fc_card_new(struct pci_dev *pdev)
 		iowrite8(0x00, card->bar[0] + MPIOINT_OFFSET);
 		iowrite8(0x00, card->bar[0] + MPIOLVL_OFFSET);
 		iowrite8(0x00, card->bar[0] + MPIOOD_OFFSET);
+
+		iowrite8(0x00, card->bar[0] + UART_EXAR_8XMODE);
+		iowrite8(0xc0, card->bar[0] + UART_EXAR_FCTR);
+		iowrite8(32, card->bar[0] + UART_EXAR_TXTRG);
+		iowrite8(32, card->bar[0] + UART_EXAR_RXTRG);
 		break;
 
 	case FC_422_2_PCIe_ID:
@@ -294,7 +304,7 @@ struct fc_card *fc_card_new(struct pci_dev *pdev)
 		iowrite8(0x00, card->bar[0] + MPIOODH_OFFSET);
 
 		iowrite8(0x00, card->bar[0] + UART_EXAR_8XMODE);
-		iowrite8(0xc0, card->bar[0] + UART_EXAR_FCTR); /* FIFO trigger table D programmable */
+		iowrite8(0xc0, card->bar[0] + UART_EXAR_FCTR);
 		iowrite8(128, card->bar[0] + UART_EXAR_TXTRG);
 		iowrite8(128, card->bar[0] + UART_EXAR_RXTRG);
 		break;
