@@ -1,14 +1,14 @@
 /*
 	Copyright (C) 2011 Commtech, Inc.
 
-	This file is part of fc335-linux.
+	This file is part of serial-fc.
 
-	fc335-linux is free software: you can redistribute it and/or modify
+	serial-fc is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	fc335-linux is distributed in the hope that it will be useful,
+	serial-fc is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
@@ -24,7 +24,7 @@
 #include <stdlib.h> /* EXIT_SUCCESS, EXIT_FAILURE */
 
 /*
-	This is a simple example showing how to write asynchronous data to a port's 
+	This is a simple example showing how to write asynchronous data to a port's
 	UART.
 
 */

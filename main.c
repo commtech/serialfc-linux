@@ -1,20 +1,20 @@
 /*
 	Copyright (C) 2011  Commtech, Inc.
 
-	This file is part of fc335-linux.
+	This file is part of serial-fc.
 
-	fc335-linux is free software: you can redistribute it and/or modify
+	serial-fc is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	fc335-linux is distributed in the hope that it will be useful,
+	serial-fc is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
 
 	You should have received a copy of the GNU General Public License
-	along with fc335-linux.  If not, see <http://www.gnu.org/licenses/>.
+	along with serial-fc.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
@@ -26,14 +26,14 @@
 
 #define COMMTECH_VENDOR_ID 0x18f7
 
-#define FC_422_2_PCI_ID 0x0004
-#define FC_422_4_PCI_ID 0x0002
-#define FC_232_4_PCI_ID 0x000a
-#define FC_232_8_PCI_ID 0x000b
+#define FC_422_2_PCI_335_ID 0x0004
+#define FC_422_4_PCI_335_ID 0x0002
+#define FC_232_4_PCI_335_ID 0x000a
+#define FC_232_8_PCI_335_ID 0x000b
 #define FC_422_4_PCIe_ID 0x0020
 #define FC_422_8_PCIe_ID 0x0021
 
-#define DEVICE_NAME "fc-async"
+#define DEVICE_NAME "serial-fc"
 
 #define MPIOINT_OFFSET 0x8f
 #define MPIOLVL_OFFSET 0x90
@@ -49,10 +49,10 @@
 #define MPIOSELH_OFFSET 0x99
 #define MPIOODH_OFFSET 0x9a
 
-#define UART_EXAR_8XMODE 0x88    /* 8X sampling rate select */
-#define UART_EXAR_TXTRG 0x0a    /* Tx FIFO trigger level write-only */
-#define UART_EXAR_RXTRG 0x0b    /* Rx FIFO trigger level write-only */
-#define UART_EXAR_FCTR 0x08    /* Feature Control Register */
+#define UART_EXAR_8XMODE 0x88 /* 8X sampling rate select */
+#define UART_EXAR_TXTRG 0x0a /* Tx FIFO trigger level write-only */
+#define UART_EXAR_RXTRG 0x0b /* Rx FIFO trigger level write-only */
+#define UART_EXAR_FCTR 0x08 /* Feature Control Register */
 
 #define return_if_untrue(expr) \
 	if (expr) {} else \
@@ -72,10 +72,11 @@ struct fc_card {
 	struct list_head list;
 	struct pci_dev *pci_dev;
 	struct serial_private *serial_priv;
-	void __iomem *bar[1];
+	void __iomem *addr;
 };
 
-struct fc_card *fc_card_new(struct pci_dev *pdev);
+struct fc_card *fc_pci_card_new(struct pci_dev *pdev);
+struct fc_card *fc_pcie_card_new(struct pci_dev *pdev);
 
 void fc_card_delete(struct fc_card *card);
 
@@ -85,11 +86,10 @@ struct fc_card *fc_card_find(struct pci_dev *pdev,
 LIST_HEAD(fc_cards);
 
 struct pci_device_id fc_id_table[] __devinitdata = {
-	{ COMMTECH_VENDOR_ID, FC_422_2_PCI_ID, PCI_ANY_ID, 0, 0, 0 },
-	{ COMMTECH_VENDOR_ID, FC_422_4_PCI_ID, PCI_ANY_ID, 0, 0, 0 },
-	{ COMMTECH_VENDOR_ID, FC_232_4_PCI_ID, PCI_ANY_ID, 0, 0, 0 },
-	{ COMMTECH_VENDOR_ID, FC_232_8_PCI_ID, PCI_ANY_ID, 0, 0, 0 },
-	{ COMMTECH_VENDOR_ID, FC_422_2_PCIe_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, FC_422_2_PCI_335_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, FC_422_4_PCI_335_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, FC_232_4_PCI_335_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, FC_232_8_PCI_335_ID, PCI_ANY_ID, 0, 0, 0 },
 	{ COMMTECH_VENDOR_ID, FC_422_4_PCIe_ID, PCI_ANY_ID, 0, 0, 0 },
 	{ COMMTECH_VENDOR_ID, FC_422_8_PCIe_ID, PCI_ANY_ID, 0, 0, 0 },
 	{ 0, },
@@ -103,7 +103,19 @@ static int __devinit fc_probe(struct pci_dev *pdev,
 	if (pci_enable_device(pdev))
 		return -EIO;
 
-	new_card = fc_card_new(pdev);
+	switch (pdev->device) {
+	case FC_422_2_PCI_335_ID:
+	case FC_422_4_PCI_335_ID:
+	case FC_232_4_PCI_335_ID:
+	case FC_232_8_PCI_335_ID:
+		new_card = fc_pci_card_new(pdev);
+		break;
+
+	case FC_422_4_PCIe_ID:
+	case FC_422_8_PCIe_ID:
+		new_card = fc_pcie_card_new(pdev);
+		break;
+	}
 
 	if (new_card)
 		list_add_tail(&new_card->list, &fc_cards);
@@ -201,7 +213,7 @@ struct pciserial_board fc_8_pcie_board = {
 };
 
 
-struct fc_card *fc_card_new(struct pci_dev *pdev)
+struct fc_card *fc_pci_card_new(struct pci_dev *pdev)
 {
 	struct fc_card *card = 0;
 	unsigned i = 0;
@@ -214,23 +226,76 @@ struct fc_card *fc_card_new(struct pci_dev *pdev)
 	card->pci_dev = pdev;
 
 	switch (pdev->device) {
-	case FC_422_2_PCI_ID:
+	case FC_422_2_PCI_335_ID:
 		card->serial_priv = pciserial_init_ports(pdev, &fc_2_pci_board);
 		break;
 
-	case FC_422_4_PCI_ID:
-	case FC_232_4_PCI_ID:
+	case FC_422_4_PCI_335_ID:
+	case FC_232_4_PCI_335_ID:
 		card->serial_priv = pciserial_init_ports(pdev, &fc_4_pci_board);
 		break;
 
-	case FC_232_8_PCI_ID:
+	case FC_232_8_PCI_335_ID:
 		card->serial_priv = pciserial_init_ports(pdev, &fc_8_pci_board);
 		break;
+	}
 
-	case FC_422_2_PCIe_ID:
-		card->serial_priv = pciserial_init_ports(pdev, &fc_2_pcie_board);
+	if (IS_ERR(card->serial_priv)) {
+		dev_err(&card->pci_dev->dev, "pciserial_init_ports failed\n");
+		return 0;
+	}
+
+	pci_set_drvdata(pdev, card->serial_priv);
+
+	card->addr = pci_iomap(card->pci_dev, 0, 0);
+
+	if (card->addr == NULL) {
+		dev_err(&card->pci_dev->dev, "pci_iomap failed on bar #%i\n", i);
+		return 0;
+	}
+
+	switch (pdev->device) {
+	case FC_422_2_PCI_335_ID:
+	case FC_422_4_PCI_335_ID:
+		iowrite8(0x00, card->addr + MPIOSEL_OFFSET);
+		iowrite8(0x00, card->addr + MPIOINV_OFFSET);
+		iowrite8(0x78, card->addr + MPIOLVL_OFFSET);
+		iowrite8(0x00, card->addr + MPIOOD_OFFSET);
 		break;
 
+	case FC_232_4_PCI_335_ID:
+	case FC_232_8_PCI_335_ID:
+		iowrite8(0xc0, card->addr + MPIOSEL_OFFSET);
+		iowrite8(0xc0, card->addr + MPIOINV_OFFSET);
+		iowrite8(0x00, card->addr + MPIOLVL_OFFSET);
+		iowrite8(0x00, card->addr + MPIOOD_OFFSET);
+		break;
+	}
+
+	iowrite8(0x00, card->addr + MPIO3T_OFFSET);
+	iowrite8(0x00, card->addr + MPIOINT_OFFSET);
+
+	iowrite8(0x00, card->addr + UART_EXAR_8XMODE);
+	iowrite8(0xc0, card->addr + UART_EXAR_FCTR);
+	iowrite8(32, card->addr + UART_EXAR_TXTRG);
+	iowrite8(32, card->addr + UART_EXAR_RXTRG);
+
+	return card;
+}
+
+struct fc_card *fc_pcie_card_new(struct pci_dev *pdev)
+{
+	struct fc_card *card = 0;
+	unsigned i = 0;
+
+	card = kmalloc(sizeof(*card), GFP_KERNEL);
+
+	return_val_if_untrue(card != NULL, 0);
+	INIT_LIST_HEAD(&card->list);
+
+	card->pci_dev = pdev;
+
+	switch (pdev->device) {
 	case FC_422_4_PCIe_ID:
 		card->serial_priv = pciserial_init_ports(pdev, &fc_4_pcie_board);
 		break;
@@ -247,67 +312,20 @@ struct fc_card *fc_card_new(struct pci_dev *pdev)
 
 	pci_set_drvdata(pdev, card->serial_priv);
 
-	card->bar[0] = pci_iomap(card->pci_dev, 0, 0);
+	card->addr = pci_iomap(card->pci_dev, 0, 0);
 
-	if (card->bar[i] == NULL) {
+	if (card->addr == NULL) {
 		dev_err(&card->pci_dev->dev, "pci_iomap failed on bar #%i\n", i);
 		return 0;
 	}
 
-	switch (pdev->device) {
-	case FC_422_2_PCI_ID:
-	case FC_422_4_PCI_ID:
-		iowrite8(0x00, card->bar[0] + MPIOSEL_OFFSET);
-		iowrite8(0x00, card->bar[0] + MPIOINV_OFFSET);
-		iowrite8(0x00, card->bar[0] + MPIO3T_OFFSET);
-		iowrite8(0x00, card->bar[0] + MPIOINT_OFFSET);
-		iowrite8(0x78, card->bar[0] + MPIOLVL_OFFSET);
-		iowrite8(0x00, card->bar[0] + MPIOOD_OFFSET);
+	for (i = MPIOINT_OFFSET; i <= MPIOODH_OFFSET; i++)
+		iowrite8(0x00, card->addr + i);
 
-		iowrite8(0x00, card->bar[0] + UART_EXAR_8XMODE);
-		iowrite8(0xc0, card->bar[0] + UART_EXAR_FCTR);
-		iowrite8(32, card->bar[0] + UART_EXAR_TXTRG);
-		iowrite8(32, card->bar[0] + UART_EXAR_RXTRG);
-		break;
-
-	case FC_232_4_PCI_ID:
-	case FC_232_8_PCI_ID:
-		iowrite8(0xc0, card->bar[0] + MPIOSEL_OFFSET);
-		iowrite8(0xc0, card->bar[0] + MPIOINV_OFFSET);
-		iowrite8(0x00, card->bar[0] + MPIO3T_OFFSET);
-		iowrite8(0x00, card->bar[0] + MPIOINT_OFFSET);
-		iowrite8(0x00, card->bar[0] + MPIOLVL_OFFSET);
-		iowrite8(0x00, card->bar[0] + MPIOOD_OFFSET);
-
-		iowrite8(0x00, card->bar[0] + UART_EXAR_8XMODE);
-		iowrite8(0xc0, card->bar[0] + UART_EXAR_FCTR);
-		iowrite8(32, card->bar[0] + UART_EXAR_TXTRG);
-		iowrite8(32, card->bar[0] + UART_EXAR_RXTRG);
-		break;
-
-	case FC_422_2_PCIe_ID:
-	case FC_422_4_PCIe_ID:
-	case FC_422_8_PCIe_ID:
-		iowrite8(0x00, card->bar[0] + MPIOINT_OFFSET);
-		iowrite8(0x00, card->bar[0] + MPIOLVL_OFFSET);
-		iowrite8(0x00, card->bar[0] + MPIO3T_OFFSET);
-		iowrite8(0x00, card->bar[0] + MPIOINV_OFFSET);
-		iowrite8(0x00, card->bar[0] + MPIOSEL_OFFSET);
-		iowrite8(0x00, card->bar[0] + MPIOOD_OFFSET);
-
-		iowrite8(0x00, card->bar[0] + MPIOINTH_OFFSET);
-		iowrite8(0x00, card->bar[0] + MPIOLVLH_OFFSET);
-		iowrite8(0x00, card->bar[0] + MPIO3TH_OFFSET);
-		iowrite8(0x00, card->bar[0] + MPIOINVH_OFFSET);
-		iowrite8(0x00, card->bar[0] + MPIOSELH_OFFSET);
-		iowrite8(0x00, card->bar[0] + MPIOODH_OFFSET);
-
-		iowrite8(0x00, card->bar[0] + UART_EXAR_8XMODE);
-		iowrite8(0xc0, card->bar[0] + UART_EXAR_FCTR);
-		iowrite8(128, card->bar[0] + UART_EXAR_TXTRG);
-		iowrite8(128, card->bar[0] + UART_EXAR_RXTRG);
-		break;
-	}
+	iowrite8(0x00, card->addr + UART_EXAR_8XMODE);
+	iowrite8(0xc0, card->addr + UART_EXAR_FCTR);
+	iowrite8(128, card->addr + UART_EXAR_TXTRG);
+	iowrite8(128, card->addr + UART_EXAR_RXTRG);
 
 	return card;
 }
