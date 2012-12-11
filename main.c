@@ -1,20 +1,20 @@
 /*
-	Copyright (C) 2011  Commtech, Inc.
+	Copyright (C) 2012  Commtech, Inc.
 
-	This file is part of serial-fc.
+	This file is part of serialfc-linux.
 
-	serial-fc is free software: you can redistribute it and/or modify
+	serialfc-linux is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	serial-fc is distributed in the hope that it will be useful,
+	serialfc-linux is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
 
 	You should have received a copy of the GNU General Public License
-	along with serial-fc.  If not, see <http://www.gnu.org/licenses/>.
+	along with serialfc-linux.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
@@ -32,7 +32,7 @@
 #define FC_422_4_PCIe_ID 0x0020
 #define FC_422_8_PCIe_ID 0x0021
 
-#define DEVICE_NAME "serial-fc"
+#define DEVICE_NAME "serialfc"
 
 #define MPIOINT_OFFSET 0x8f
 #define MPIOLVL_OFFSET 0x90

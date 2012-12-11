@@ -5,11 +5,11 @@ architecture.
     the whole thing.  Now we have a kernel module that will attach all of our
     current Async ports to the default Linux serial driver.
 
-    To use this kernel module simply change to the serial-fc directory and
+    To use this kernel module simply change to the serialfc directory and
     type:
 
         make
-        sudo insmod serial_fc.ko
+        sudo insmod serialfc.ko
 
     You can verify that the new ports were detected by checking the message log
 
@@ -39,11 +39,11 @@ architecture.
     lines modified appropriately.
 
 1.2 If you would like to keep up with the most recent changes, you may always
-    obtain the latest source for serial-fc from the Google Code repo found at:
+    obtain the latest source for serialfc-linux from the Github repo found at:
 
-        http://hg.commtech-fastcom.com/serial-fc
+        https://github.com/commtech/serialfc-linux
 
-    Alternatively you can clone the repo using Mercurial:
+    Alternatively you can clone the repo using Git:
 
-        hg clone http://hg.commtech-fastcom.com/serial-fc
+        git clone git://github.com/commtech/serialfc-linux.git
 
