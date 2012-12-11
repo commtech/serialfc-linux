@@ -7,6 +7,14 @@ serialfc-objs := main.o
 default:
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules
 
+install:
+	cp serialfc.ko /lib/modules/`uname -r`/kernel/drivers/tty/serial/8250/
+	depmod
+
+uninstall:
+	rm /lib/modules/`uname -r`/kernel/drivers/tty/serial/8250/serialfc.ko
+	depmod
+
 clean:
 	@find . $(IGNORE) \
 	\( -name '*.[oas]' -o -name '*.ko' -o -name '.*.cmd' \
