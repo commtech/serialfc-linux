@@ -84,7 +84,7 @@ struct fc_card *fc_card_find(struct pci_dev *pdev,
 
 LIST_HEAD(fc_cards);
 
-struct pci_device_id fc_id_table[] __devinitdata = {
+struct pci_device_id fc_id_table[] = {
 	{ COMMTECH_VENDOR_ID, FC_422_2_PCI_335_ID, PCI_ANY_ID, 0, 0, 0 },
 	{ COMMTECH_VENDOR_ID, FC_422_4_PCI_335_ID, PCI_ANY_ID, 0, 0, 0 },
 	{ COMMTECH_VENDOR_ID, FC_232_4_PCI_335_ID, PCI_ANY_ID, 0, 0, 0 },
@@ -94,7 +94,7 @@ struct pci_device_id fc_id_table[] __devinitdata = {
 	{ 0, },
 };
 
-static int __devinit fc_probe(struct pci_dev *pdev,
+static int fc_probe(struct pci_dev *pdev,
                                    const struct pci_device_id *id)
 {
 	struct fc_card *new_card = 0;
@@ -122,7 +122,7 @@ static int __devinit fc_probe(struct pci_dev *pdev,
 	return 0;
 }
 
-static void __devexit fc_remove(struct pci_dev *pdev)
+static void fc_remove(struct pci_dev *pdev)
 {
 	struct fc_card *card = 0;
 
