@@ -1,11 +1,19 @@
-obj-m 	:= serial_fc.o
+obj-m 	:= serialfc.o
 KDIR	:= /lib/modules/$(shell uname -r)/build
 PWD	:= $(shell pwd)
 IGNORE	:=
-serial_fc-objs := main.o
+serialfc-objs := main.o
 
 default:
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules
+
+install:
+	cp serialfc.ko /lib/modules/`uname -r`/kernel/drivers/tty/serial/8250/
+	depmod
+
+uninstall:
+	rm /lib/modules/`uname -r`/kernel/drivers/tty/serial/8250/serialfc.ko
+	depmod
 
 clean:
 	@find . $(IGNORE) \
