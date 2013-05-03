@@ -102,9 +102,13 @@ make uninstall
 
 ### FAQ
 
-####
-Q: How do I give my user account permissions to touch the serial ports?
-A: `adduser <username> dialout`
+##### Q: How do I give my user account permissions to touch the serial ports?
+```
+adduser <username> dialout
+```
 
-Q: How do I prevent `setserial` from caching old serial port settings?
-A: In Debian based distributions you can reconfigure the setserial package `dpkg-reconfigure setserial` and set the default option to 'manual'.
+##### Q: How do I prevent `setserial` from caching old serial port settings?
+In Debian based distributions you can reconfigure the setserial package  and set the default option to `manual`.
+```
+dpkg-reconfigure setserial
+```
