@@ -91,8 +91,11 @@ struct fc_port *fc_port_new(struct fc_card *card, unsigned channel,
 #endif
 
     switch (fastcom_get_card_type(port)) {
-    case CARD_TYPE_PCI:
     case CARD_TYPE_FSCC:
+        default_clock_rate = 64000000;
+        break;
+
+    case CARD_TYPE_PCI:
         default_clock_rate = 18432000;
         break;
 
