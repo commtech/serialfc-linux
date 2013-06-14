@@ -99,3 +99,16 @@ To uninstall, use the included uninstaller.
 ```
 make uninstall
 ```
+
+### FAQ
+
+##### How do I give my user account permissions to touch the serial ports?
+```
+adduser <username> dialout
+```
+
+##### How do I prevent `setserial` from caching old serial port settings?
+In Debian based distributions you can reconfigure the setserial package  and set the default option to `manual`.
+```
+dpkg-reconfigure setserial
+```
