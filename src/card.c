@@ -1,5 +1,6 @@
 #include <linux/slab.h>
 #include <linux/pci.h> /* struct pci_dev */
+#include <linux/version.h> /* poll_wait, POLL* */
 
 #include "card.h"
 #include "port.h"
@@ -54,11 +55,13 @@ struct pciserial_board fc_8_pcie_board = {
 	.first_offset = 0,
 };
 
-struct fc_card *fc_card_new(struct pci_dev *pdev)
+struct fc_card *fc_card_new(struct pci_dev *pdev, unsigned major_number,
+							struct class *class, struct file_operations *fops)
 {
 	struct fc_card *card = 0;
 	struct fc_port *port_iter = 0;
 	struct pciserial_board *board = 0;
+	static unsigned minor_number = 0;
 	unsigned i = 0;
 
 	card = kmalloc(sizeof(*card), GFP_KERNEL);
@@ -93,6 +96,7 @@ struct fc_card *fc_card_new(struct pci_dev *pdev)
 		break;
 	}
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 8, 0)
 	card->serial_priv = pciserial_init_ports(pdev, board);
 
 	if (IS_ERR(card->serial_priv)) {
@@ -101,6 +105,7 @@ struct fc_card *fc_card_new(struct pci_dev *pdev)
 	}
 
 	pci_set_drvdata(pdev, card->serial_priv);
+#endif
 
 	card->addr = pci_iomap(card->pci_dev, 0, 0);
 
@@ -111,10 +116,14 @@ struct fc_card *fc_card_new(struct pci_dev *pdev)
 
 	/* There are two ports per card. */
 	for (i = 0; i < board->num_ports; i++) {
-		port_iter = fc_port_new(card, i, card->addr + (board->uart_offset * i));
+		port_iter = fc_port_new(card, i, major_number, minor_number,
+		                        card->addr + (board->uart_offset * i),
+		                        &card->pci_dev->dev, class, fops);
 
 		if (port_iter)
 			list_add_tail(&port_iter->list, &card->ports);
+
+		minor_number += 1;
 	}
 
 	return card;
@@ -136,7 +145,10 @@ void fc_card_delete(struct fc_card *card)
 		fc_port_delete(current_port);
 	}
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 8, 0)
 	pciserial_remove_ports(card->serial_priv);
+#endif
+
 	pci_set_drvdata(card->pci_dev, NULL);
 
 	kfree(card);

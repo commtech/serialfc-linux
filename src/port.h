@@ -22,63 +22,32 @@
 #define PORT_H
 
 #include <linux/list.h>
+#include <linux/cdev.h> /* struct cdev */
+#include <linux/version.h> /* LINUX_VERSION_CODE, KERNEL_VERSION */
 
 #include "card.h"
 
 struct fc_port {
 	struct list_head list;
+	dev_t dev_t;
+	struct class *class;
+	struct cdev cdev;
+	struct device *device;
+	char *name;
 	void __iomem *addr;
 	unsigned channel;
 	struct fc_card *card;
 	unsigned sample_rate;
 	unsigned clock_rate;
 	unsigned char ACR;
+	unsigned tx_trigger;
+	unsigned rx_trigger;
 };
 
-struct fc_port *fc_port_new(struct fc_card *card, unsigned channel, void __iomem *addr);
+struct fc_port *fc_port_new(struct fc_card *card, unsigned channel,
+							unsigned major_number, unsigned minor_number,
+                            void __iomem *addr, struct device *parent,
+                            struct class *class, struct file_operations *fops);
 void fc_port_delete(struct fc_port *port);
-
-int fastcom_set_sample_rate(struct fc_port *port, unsigned value);
-void fastcom_get_sample_rate(struct fc_port *port, unsigned *value);
-
-int fastcom_set_tx_trigger(struct fc_port *port, unsigned value);
-int fastcom_get_tx_trigger(struct fc_port *port, unsigned *value);
-
-int fastcom_set_rx_trigger(struct fc_port *port, unsigned value);
-int fastcom_get_rx_trigger(struct fc_port *port, unsigned *value);
-
-int fastcom_set_termination(struct fc_port *port, int enable);
-int fastcom_enable_termination(struct fc_port *port);
-int fastcom_disable_termination(struct fc_port *port);
-int fastcom_get_termination(struct fc_port *port, int *enabled);
-
-void fastcom_set_echo_cancel(struct fc_port *port, int enable);
-void fastcom_enable_echo_cancel(struct fc_port *port);
-void fastcom_disable_echo_cancel(struct fc_port *port);
-void fastcom_get_echo_cancel(struct fc_port *port, int *enabled);
-
-int fastcom_set_rs485(struct fc_port *port, int enable);
-void fastcom_enable_rs485(struct fc_port *port);
-void fastcom_disable_rs485(struct fc_port *port);
-int fastcom_get_rs485(struct fc_port *port, int *enabled);
-
-int fastcom_set_clock_rate(struct fc_port *port, unsigned rate);
-
-int fastcom_set_isochronous(struct fc_port *port, int mode);
-int fastcom_enable_isochronous(struct fc_port *port, unsigned mode);
-int fastcom_disable_isochronous(struct fc_port *port);
-int fastcom_get_isochronous(struct fc_port *port, int *mode);
-
-int fastcom_set_external_transmit(struct fc_port *port, unsigned num_chars);
-int fastcom_enable_external_transmit(struct fc_port *port, unsigned num_chars);
-int fastcom_disable_external_transmit(struct fc_port *port);
-int fastcom_get_external_transmit(struct fc_port *port, unsigned *num_chars);
-
-int fastcom_set_frame_length(struct fc_port *port, unsigned num_chars);
-int fastcom_get_frame_lengtht(struct fc_port *port, unsigned *num_chars);
-
-int pcie_set_baud_rate(struct fc_port *port, unsigned value);
-
-enum FASTCOM_CARD_TYPE fastcom_get_card_type(struct fc_port *port);
 
 #endif

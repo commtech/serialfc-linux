@@ -2,7 +2,7 @@ obj-m 	:= serialfc.o
 KDIR	:= /lib/modules/$(shell uname -r)/build
 PWD	:= $(shell pwd)
 IGNORE	:=
-serialfc-objs := src/main.o src/card.o src/port.o
+serialfc-objs := src/main.o src/card.o src/port.o src/utils.o
 
 default:
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules
