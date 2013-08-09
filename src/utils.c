@@ -45,7 +45,7 @@ int fastcom_set_sample_rate_pci(struct fc_port *port, unsigned value)
     unsigned char current_8x_mode, new_8x_mode;
 
     if (value != 8 && value != 16)
-        return -1; //TODO: return -EOPNOTSUPP / STATUS_INVALID_PARAMETER;
+        return -EINVAL;
 
     current_8x_mode = ioread8(port->addr + UART_EXAR_8XMODE);
 
@@ -58,8 +58,8 @@ int fastcom_set_sample_rate_pci(struct fc_port *port, unsigned value)
         new_8x_mode = current_8x_mode & ~(1 << port->channel);
         break;
 
-    default: // TODO: This should never be reached due to the initial if check, here for compiler
-        return -1;
+    default: // This should never be reached due to the initial if check
+        return -EINVAL;
     }
 
     iowrite8(new_8x_mode, port->addr + UART_EXAR_8XMODE);
@@ -73,7 +73,7 @@ int fastcom_set_sample_rate_pcie(struct fc_port *port, unsigned value)
     unsigned char current_4x_mode, new_4x_mode;
 
     if (value != 4 && value != 8 && value != 16)
-        return -1; //TODO: return -EOPNOTSUPP / STATUS_INVALID_PARAMETER;
+        return -EINVAL;
 
     current_4x_mode = ioread8(port->addr + UART_EXAR_4XMODE);
     current_8x_mode = ioread8(port->addr + UART_EXAR_8XMODE);
@@ -94,8 +94,8 @@ int fastcom_set_sample_rate_pcie(struct fc_port *port, unsigned value)
         new_8x_mode = current_8x_mode & ~(1 << port->channel);
         break;
 
-    default: // This should never be reached due to the initial if check: TODO Compiler
-        return -1;
+    default: // This should never be reached due to the initial if check
+        return -EINVAL;
     }
 
     iowrite8(new_4x_mode, port->addr + UART_EXAR_4XMODE);
@@ -109,7 +109,7 @@ int fastcom_set_sample_rate_fscc(struct fc_port *port, unsigned value)
     unsigned char orig_lcr;
 
     if (value < 4 || value > 16)
-        return -1; //TODO: return -EOPNOTSUPP;
+        return -EINVAL;
 
     orig_lcr = ioread8(port->addr + LCR_OFFSET);
 
@@ -124,7 +124,7 @@ int fastcom_set_sample_rate_fscc(struct fc_port *port, unsigned value)
 
 int fastcom_set_sample_rate(struct fc_port *port, unsigned value)
 {
-    int status = -1;
+    int status;
 
     switch (fastcom_get_card_type(port)) {
     case CARD_TYPE_PCI:
@@ -162,7 +162,7 @@ void fastcom_get_sample_rate(struct fc_port *port, unsigned *value)
 int fastcom_set_tx_trigger_pci(struct fc_port *port, unsigned value)
 {
     if (value > 64)
-        return -1; //TODO: return -EOPNOTSUPP;
+        return -EINVAL;
 
     iowrite8((unsigned char)value, port->addr + UART_EXAR_TXTRG);
 
@@ -172,7 +172,7 @@ int fastcom_set_tx_trigger_pci(struct fc_port *port, unsigned value)
 int fastcom_set_tx_trigger_pcie(struct fc_port *port, unsigned value)
 {
     if (value > 255)
-        return -1; //TODO: return -EOPNOTSUPP;
+        return -EINVAL;
 
     iowrite8((unsigned char)value, port->addr + UART_EXAR_TXTRG);
 
@@ -184,7 +184,7 @@ int fastcom_set_tx_trigger_fscc(struct fc_port *port, unsigned value)
     unsigned char orig_lcr;
 
     if (value > 127)
-        return -1; //TODO: return -EOPNOTSUPP;
+        return -EINVAL;
 
     orig_lcr = ioread8(port->addr + LCR_OFFSET);
 
@@ -199,7 +199,7 @@ int fastcom_set_tx_trigger_fscc(struct fc_port *port, unsigned value)
 
 int fastcom_set_tx_trigger(struct fc_port *port, unsigned value)
 {
-    int status = -1;
+    int status;
 
     switch (fastcom_get_card_type(port)) {
     case CARD_TYPE_PCI:
@@ -215,7 +215,7 @@ int fastcom_set_tx_trigger(struct fc_port *port, unsigned value)
         break;
 
     default:
-        status = -1; //TODO: return -EOPNOTSUPP;
+        status = -EPROTONOSUPPORT;
     }
 
     if (status == 0) {
@@ -261,7 +261,7 @@ int fastcom_get_tx_trigger(struct fc_port *port, unsigned *value)
         break;
 
     default:
-        return -1; // TODO: return -1; // TODO: STATUS_NOT_SUPPORTED;
+        return -EPROTONOSUPPORT;
     }
 
     return 0;
@@ -270,7 +270,7 @@ int fastcom_get_tx_trigger(struct fc_port *port, unsigned *value)
 int fastcom_set_rx_trigger_pci(struct fc_port *port, unsigned value)
 {
     if (value > 64)
-        return -1; //TODO: return -EOPNOTSUPP;
+        return -EINVAL;
 
     iowrite8((unsigned char)value, port->addr + UART_EXAR_RXTRG);
 
@@ -280,7 +280,7 @@ int fastcom_set_rx_trigger_pci(struct fc_port *port, unsigned value)
 int fastcom_set_rx_trigger_pcie(struct fc_port *port, unsigned value)
 {
     if (value > 255)
-        return -1; //TODO: return -EOPNOTSUPP;
+        return -EINVAL;
 
     iowrite8((unsigned char)value, port->addr + UART_EXAR_RXTRG);
 
@@ -292,7 +292,7 @@ int fastcom_set_rx_trigger_fscc(struct fc_port *port, unsigned value)
     unsigned char orig_lcr;
 
     if (value > 127)
-        return -1; //TODO: return -EOPNOTSUPP;
+        return -EINVAL;
 
     orig_lcr = ioread8(port->addr + LCR_OFFSET);
 
@@ -307,7 +307,7 @@ int fastcom_set_rx_trigger_fscc(struct fc_port *port, unsigned value)
 
 int fastcom_set_rx_trigger(struct fc_port *port, unsigned value)
 {
-    int status = -1; // TODO: STATUS_UNSUCCESSFUL;
+    int status;
 
     switch (fastcom_get_card_type(port)) {
     case CARD_TYPE_PCI:
@@ -323,7 +323,7 @@ int fastcom_set_rx_trigger(struct fc_port *port, unsigned value)
         break;
 
     default:
-        status = -1; // TODO: STATUS_NOT_SUPPORTED;
+        status = -EPROTONOSUPPORT;
         break;
     }
 
@@ -370,7 +370,7 @@ int fastcom_get_rx_trigger(struct fc_port *port, unsigned *value)
         break;
 
     default:
-        return -1; // TODO: STATUS_NOT_SUPPORTED;
+        return -EPROTONOSUPPORT;
     }
 
     return 0;
@@ -459,7 +459,7 @@ int fastcom_set_rs485(struct fc_port *port, int enable)
         break;
 
     default:
-        return -1; // TODO: STATUS_NOT_SUPPORTED;
+        return -EPROTONOSUPPORT;
     }
 
 	dev_info(port->device, "RS485 = %i\n", enable);
@@ -495,10 +495,8 @@ int fastcom_get_rs485(struct fc_port *port, int *enabled)
         return 0;
 
     default:
-        return -1; // TODO: STATUS_NOT_SUPPORTED;
+        return -EPROTONOSUPPORT;
     }
-
-    return -1;
 }
 
 void fastcom_enable_rs485(struct fc_port *port)
@@ -518,7 +516,7 @@ int fastcom_set_isochronous_fscc(struct fc_port *port, int mode)
     unsigned char new_mdm = 0;
 
     if (mode > 8 || mode < -1)
-        return -1; //TODO: return -EOPNOTSUPP;
+        return -EINVAL;
 
     orig_lcr = ioread8(port->addr + LCR_OFFSET);
 
@@ -646,13 +644,12 @@ int fastcom_set_isochronous(struct fc_port *port, int mode)
         break;
 
     default:
-        status = -1; // TODO: STATUS_NOT_SUPPORTED;
+        status = -EPROTONOSUPPORT;
         break;
     }
 
-    if (status == 0) {
+    if (status == 0)
 	    dev_info(port->device, "Isochronous mode = %i\n", mode);
-    }
 
     return status;
 }
@@ -665,10 +662,8 @@ int fastcom_get_isochronous(struct fc_port *port, int *mode)
         return 0;
 
     default:
-        return -1; // TODO: STATUS_NOT_SUPPORTED;
+        return -EPROTONOSUPPORT;
     }
-
-    return -1;
 }
 
 int fastcom_enable_isochronous(struct fc_port *port, unsigned mode)
@@ -706,7 +701,7 @@ void fastcom_get_termination_pcie(struct fc_port *port, int *enabled)
 
 int fastcom_set_termination(struct fc_port *port, int enable)
 {
-    int status = -1; // TODO: STATUS_UNSUCCESSFUL;
+    int status;
 
     switch (fastcom_get_card_type(port)) {
     case CARD_TYPE_PCIe:
@@ -715,13 +710,12 @@ int fastcom_set_termination(struct fc_port *port, int enable)
         break;
 
     default:
-        status = -1; //TODO: STATUS_NOT_SUPPORTED;
+        status = -EPROTONOSUPPORT;
         break;
     }
 
-    if (status == 0) {
+    if (status == 0)
 	    dev_info(port->device, "Termination = %i\n", enable);
-    }
 
     return status;
 }
@@ -734,10 +728,8 @@ int fastcom_get_termination(struct fc_port *port, int *enabled)
         return 0;
 
     default:
-        return -1; // TODO: STATUS_NOT_SUPPORTED;
+        return -EPROTONOSUPPORT;
     }
-
-    return -1;
 }
 
 int fastcom_enable_termination(struct fc_port *port)
@@ -2179,19 +2171,19 @@ int pcie_set_baud_rate(struct fc_port *port, unsigned value)
 
 int fastcom_set_clock_rate(struct fc_port *port, unsigned value)
 {
-    int status = -1; // TODO: STATUS_UNSUCCESSFUL;
+    int status;
 
     switch (fastcom_get_card_type(port)) {
-    case CARD_TYPE_PCI:
+    //case CARD_TYPE_PCI:
         //TODO: status = fastcom_set_clock_rate_pci(port, value);
-        break;
+    //    break;
 
-    case CARD_TYPE_FSCC:
+    //case CARD_TYPE_FSCC:
         //TODO: status = fastcom_set_clock_rate_fscc(port, value);
-        break;
+    //    break;
 
     default:
-        status = -1; // TODO: STATUS_NOT_SUPPORTED;
+        status = -EPROTONOSUPPORT;
         break;
     }
 
@@ -2209,7 +2201,7 @@ int fastcom_set_external_transmit_fscc(struct fc_port *port, unsigned num_chars)
     unsigned char orig_lcr;
 
     if (num_chars > 8191)
-        return -1; //TODO: return -EOPNOTSUPP;
+        return -EINVAL;
 
     orig_lcr = ioread8(port->addr + LCR_OFFSET);
     iowrite8(0, port->addr + LCR_OFFSET); /* Ensure last LCR value is not 0xbf */
@@ -2267,7 +2259,7 @@ int fastcom_get_external_transmit(struct fc_port *port, unsigned *num_chars)
         break;
 
     default:
-        return -1; // TODO: STATUS_NOT_SUPPORTED;
+        return -EPROTONOSUPPORT;
     }
 
     return 0;
@@ -2275,7 +2267,7 @@ int fastcom_get_external_transmit(struct fc_port *port, unsigned *num_chars)
 
 int fastcom_set_external_transmit(struct fc_port *port, unsigned num_chars)
 {
-    int status = -1; // TODO: STATUS_UNSUCCESSFUL;
+    int status;
 
     switch (fastcom_get_card_type(port)) {
     case CARD_TYPE_FSCC:
@@ -2283,12 +2275,11 @@ int fastcom_set_external_transmit(struct fc_port *port, unsigned num_chars)
         break;
 
     default:
-        status = -1; // TODO: STATUS_NOT_SUPPORTED;
+        status = -EPROTONOSUPPORT;
     }
 
-    if (status == 0) {
+    if (status == 0)
 	    dev_info(port->device, "External transmit = %i\n", num_chars);
-    }
 
     return status;
 }
@@ -2308,7 +2299,7 @@ int fastcom_set_frame_length_fscc(struct fc_port *port, unsigned num_chars)
     unsigned char orig_lcr;
 
     if (num_chars == 0 || num_chars > 256)
-        return -1;
+        return -EINVAL;
 
     orig_lcr = ioread8(port->addr + LCR_OFFSET);
     iowrite8(0, port->addr + LCR_OFFSET); /* Ensure last LCR value is not 0xbf */
@@ -2344,7 +2335,7 @@ void fastcom_get_frame_length_fscc(struct fc_port *port, unsigned *num_chars)
 
 int fastcom_set_frame_length(struct fc_port *port, unsigned num_chars)
 {
-    int status = -1;
+    int status;
 
     switch (fastcom_get_card_type(port)) {
     case CARD_TYPE_FSCC:
@@ -2352,12 +2343,11 @@ int fastcom_set_frame_length(struct fc_port *port, unsigned num_chars)
         break;
 
     default:
-        status = -1; // TODO: STATUS_NOT_SUPPORTED;
+        status = -EPROTONOSUPPORT;
     }
 
-    if (status == 0) {
+    if (status == 0)
 	    dev_info(port->device, "Frame length = %i\n", num_chars);
-    }
 
     return status;
 }
@@ -2370,7 +2360,7 @@ int fastcom_get_frame_length(struct fc_port *port, unsigned *num_chars)
         break;
 
     default:
-        return -1; // TODO: STATUS_NOT_SUPPORTED;
+        return -EPROTONOSUPPORT;
     }
 
     return 0;
