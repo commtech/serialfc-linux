@@ -107,7 +107,7 @@ int serialfc_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 		break;
 
     case IOCTL_FASTCOM_SET_SAMPLE_RATE:
-		error_code = fastcom_set_sample_rate(port, (int)arg);
+		error_code = fastcom_set_sample_rate(port, (unsigned)arg);
 		break;
 
     case IOCTL_FASTCOM_GET_SAMPLE_RATE:
@@ -115,7 +115,7 @@ int serialfc_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 		break;
 
     case IOCTL_FASTCOM_SET_TX_TRIGGER:
-		error_code = fastcom_set_tx_trigger(port, (int)arg);
+		error_code = fastcom_set_tx_trigger(port, (unsigned)arg);
 		break;
 
     case IOCTL_FASTCOM_GET_TX_TRIGGER:
@@ -123,7 +123,7 @@ int serialfc_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 		break;
 
     case IOCTL_FASTCOM_SET_RX_TRIGGER:
-		error_code = fastcom_set_rx_trigger(port, (int)arg);
+		error_code = fastcom_set_rx_trigger(port, (unsigned)arg);
 		break;
 
     case IOCTL_FASTCOM_GET_RX_TRIGGER:
@@ -131,11 +131,11 @@ int serialfc_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 		break;
 
     case IOCTL_FASTCOM_SET_CLOCK_RATE:
-		error_code = fastcom_set_clock_rate(port, (int)arg);
+		error_code = fastcom_set_clock_rate(port, (unsigned)arg);
 		break;
 
     case IOCTL_FASTCOM_ENABLE_ISOCHRONOUS:
-		error_code = fastcom_enable_isochronous(port, (int)arg);
+		error_code = fastcom_enable_isochronous(port, (unsigned)arg);
 		break;
 
     case IOCTL_FASTCOM_DISABLE_ISOCHRONOUS:
@@ -143,11 +143,11 @@ int serialfc_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 		break;
 
     case IOCTL_FASTCOM_GET_ISOCHRONOUS:
-		error_code = fastcom_get_isochronous(port, (unsigned *)arg);
+		error_code = fastcom_get_isochronous(port, (int *)arg);
 		break;
 
     case IOCTL_FASTCOM_ENABLE_EXTERNAL_TRANSMIT:
-		error_code = fastcom_enable_external_transmit(port, (int)arg);
+		error_code = fastcom_enable_external_transmit(port, (unsigned)arg);
 		break;
 
     case IOCTL_FASTCOM_DISABLE_EXTERNAL_TRANSMIT:
@@ -159,7 +159,7 @@ int serialfc_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 		break;
 
     case IOCTL_FASTCOM_SET_FRAME_LENGTH:
-		error_code = fastcom_set_frame_length(port, (int)arg);
+		error_code = fastcom_set_frame_length(port, (unsigned)arg);
 		break;
 
     case IOCTL_FASTCOM_GET_FRAME_LENGTH:
@@ -167,7 +167,7 @@ int serialfc_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 		break;
 
     case IOCTL_FASTCOM_GET_CARD_TYPE:
-		*(unsigned *)arg = fastcom_get_card_type(port);
+		*(int *)arg = fastcom_get_card_type(port);
 		break;
 
 	default:
@@ -175,7 +175,7 @@ int serialfc_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 		return -ENOTTY;
 	}
 
-	return 0;
+	return error_code;
 }
 
 static struct file_operations serialfc_fops = {
