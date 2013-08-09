@@ -170,6 +170,18 @@ int serialfc_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 		*(int *)arg = fastcom_get_card_type(port);
 		break;
 
+    case IOCTL_FASTCOM_ENABLE_9BIT:
+		error_code = fastcom_enable_9bit(port);
+		break;
+
+    case IOCTL_FASTCOM_DISABLE_9BIT:
+		error_code = fastcom_disable_9bit(port);
+		break;
+
+    case IOCTL_FASTCOM_GET_9BIT:
+		error_code = fastcom_get_9bit(port, (unsigned *)arg);
+		break;
+
 	default:
 		dev_dbg(port->device, "unknown ioctl 0x%x\n", cmd);
 		return -ENOTTY;

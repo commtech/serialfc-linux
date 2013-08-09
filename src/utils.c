@@ -2365,3 +2365,39 @@ int fastcom_get_frame_length(struct fc_port *port, unsigned *num_chars)
 
     return 0;
 }
+
+int fastcom_set_9bit(struct fc_port *port, int enable)
+{
+    int status;
+
+    switch (fastcom_get_card_type(port)) {
+    default:
+        status = -EPROTONOSUPPORT;
+        break;
+    }
+
+    if (status == 0)
+	    dev_info(port->device, "9-Bit = %i\n", enable);
+
+    return status;
+}
+
+int fastcom_get_9bit(struct fc_port *port, int *enabled)
+{
+    switch (fastcom_get_card_type(port)) {
+    //TODO
+
+    default:
+        return -EPROTONOSUPPORT;
+    }
+}
+
+int fastcom_enable_9bit(struct fc_port *port)
+{
+    return fastcom_set_9bit(port, 1);
+}
+
+int fastcom_disable_9bit(struct fc_port *port)
+{
+    return fastcom_set_9bit(port, 0);
+}

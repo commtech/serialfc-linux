@@ -82,6 +82,11 @@ int fastcom_get_external_transmit(struct fc_port *port, unsigned *num_chars);
 int fastcom_set_frame_length(struct fc_port *port, unsigned num_chars);
 int fastcom_get_frame_length(struct fc_port *port, unsigned *num_chars);
 
+int fastcom_set_9bit(struct fc_port *port, int enable);
+int fastcom_get_9bit(struct fc_port *port, int *enabled);
+int fastcom_enable_9bit(struct fc_port *port);
+int fastcom_disable_9bit(struct fc_port *port);
+
 int pcie_set_baud_rate(struct fc_port *port, unsigned value);
 
 enum FASTCOM_CARD_TYPE fastcom_get_card_type(struct fc_port *port);
