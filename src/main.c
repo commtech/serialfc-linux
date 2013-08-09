@@ -95,11 +95,11 @@ int serialfc_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 		break;
 
     case IOCTL_FASTCOM_ENABLE_TERMINATION:
-		fastcom_enable_echo_cancel(port);
+		fastcom_enable_termination(port);
 		break;
 
     case IOCTL_FASTCOM_DISABLE_TERMINATION:
-		fastcom_disable_echo_cancel(port);
+		fastcom_disable_termination(port);
 		break;
 
     case IOCTL_FASTCOM_GET_TERMINATION:
