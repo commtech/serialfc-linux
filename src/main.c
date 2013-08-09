@@ -107,7 +107,6 @@ int serialfc_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 		break;
 
     case IOCTL_FASTCOM_SET_SAMPLE_RATE:
-        printk("j\n");
 		error_code = fastcom_set_sample_rate(port, (int)arg);
 		break;
 
