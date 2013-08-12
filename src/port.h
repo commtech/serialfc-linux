@@ -27,7 +27,7 @@
 
 #include "card.h"
 
-struct fc_port {
+struct serialfc_port {
 	struct list_head list;
 	dev_t dev_t;
 	struct class *class;
@@ -44,10 +44,14 @@ struct fc_port {
 	unsigned rx_trigger;
 };
 
-struct fc_port *fc_port_new(struct serialfc_card *card, unsigned channel,
-							unsigned major_number, unsigned minor_number,
-                            void __iomem *addr, struct device *parent,
-                            struct class *class, struct file_operations *fops);
-void fc_port_delete(struct fc_port *port);
+struct serialfc_port *serialfc_port_new(struct serialfc_card *card,
+                                        unsigned channel,
+                                        unsigned major_number,
+                                        unsigned minor_number,
+                                        void __iomem *addr,
+                                        struct device *parent,
+                                        struct class *class,
+                                        struct file_operations *fops);
+void serialfc_port_delete(struct serialfc_port *port);
 
 #endif

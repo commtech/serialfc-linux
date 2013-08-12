@@ -61,7 +61,7 @@ struct serialfc_card *serialfc_card_new(struct pci_dev *pdev,
 							            struct file_operations *fops)
 {
 	struct serialfc_card *card = 0;
-	struct fc_port *port_iter = 0;
+	struct serialfc_port *port_iter = 0;
 	struct pciserial_board *board = 0;
 	static unsigned minor_number = 0;
 	unsigned i = 0;
@@ -118,7 +118,7 @@ struct serialfc_card *serialfc_card_new(struct pci_dev *pdev,
 
 	/* There are two ports per card. */
 	for (i = 0; i < board->num_ports; i++) {
-		port_iter = fc_port_new(card, i, major_number, minor_number,
+		port_iter = serialfc_port_new(card, i, major_number, minor_number,
 		                        card->addr + (board->uart_offset * i),
 		                        &card->pci_dev->dev, class, fops);
 
@@ -139,12 +139,12 @@ void serialfc_card_delete(struct serialfc_card *card)
 	return_if_untrue(card);
 
 	list_for_each_safe(current_node, temp_node, &card->ports) {
-		struct fc_port *current_port = 0;
+		struct serialfc_port *current_port = 0;
 
-		current_port = list_entry(current_node, struct fc_port, list);
+		current_port = list_entry(current_node, struct serialfc_port, list);
 
 		list_del(current_node);
-		fc_port_delete(current_port);
+		serialfc_port_delete(current_port);
 	}
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 8, 0)

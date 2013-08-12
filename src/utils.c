@@ -18,7 +18,7 @@ unsigned is_serialfc_device(struct pci_dev *pdev)
 	return 0;
 }
 
-enum FASTCOM_CARD_TYPE fastcom_get_card_type(struct fc_port *port)
+enum FASTCOM_CARD_TYPE fastcom_get_card_type(struct serialfc_port *port)
 {
     switch (port->card->pci_dev->device) {
     case FC_422_2_PCI_335_ID:
@@ -40,7 +40,7 @@ enum FASTCOM_CARD_TYPE fastcom_get_card_type(struct fc_port *port)
     return CARD_TYPE_UNKNOWN;
 }
 
-int fastcom_set_sample_rate_pci(struct fc_port *port, unsigned value)
+int fastcom_set_sample_rate_pci(struct serialfc_port *port, unsigned value)
 {
     unsigned char current_8x_mode, new_8x_mode;
 
@@ -67,7 +67,7 @@ int fastcom_set_sample_rate_pci(struct fc_port *port, unsigned value)
     return 0;
 }
 
-int fastcom_set_sample_rate_pcie(struct fc_port *port, unsigned value)
+int fastcom_set_sample_rate_pcie(struct serialfc_port *port, unsigned value)
 {
     unsigned char current_8x_mode, new_8x_mode;
     unsigned char current_4x_mode, new_4x_mode;
@@ -104,7 +104,7 @@ int fastcom_set_sample_rate_pcie(struct fc_port *port, unsigned value)
     return 0;
 }
 
-int fastcom_set_sample_rate_fscc(struct fc_port *port, unsigned value)
+int fastcom_set_sample_rate_fscc(struct serialfc_port *port, unsigned value)
 {
     unsigned char orig_lcr;
 
@@ -122,7 +122,7 @@ int fastcom_set_sample_rate_fscc(struct fc_port *port, unsigned value)
     return 0;
 }
 
-int fastcom_set_sample_rate(struct fc_port *port, unsigned value)
+int fastcom_set_sample_rate(struct serialfc_port *port, unsigned value)
 {
     int status;
 
@@ -154,12 +154,12 @@ int fastcom_set_sample_rate(struct fc_port *port, unsigned value)
     return status;
 }
 
-void fastcom_get_sample_rate(struct fc_port *port, unsigned *value)
+void fastcom_get_sample_rate(struct serialfc_port *port, unsigned *value)
 {
     *value = port->sample_rate;
 }
 
-int fastcom_set_tx_trigger_pci(struct fc_port *port, unsigned value)
+int fastcom_set_tx_trigger_pci(struct serialfc_port *port, unsigned value)
 {
     if (value > 64)
         return -EINVAL;
@@ -169,7 +169,7 @@ int fastcom_set_tx_trigger_pci(struct fc_port *port, unsigned value)
     return 0;
 }
 
-int fastcom_set_tx_trigger_pcie(struct fc_port *port, unsigned value)
+int fastcom_set_tx_trigger_pcie(struct serialfc_port *port, unsigned value)
 {
     if (value > 255)
         return -EINVAL;
@@ -179,7 +179,7 @@ int fastcom_set_tx_trigger_pcie(struct fc_port *port, unsigned value)
     return 0;
 }
 
-int fastcom_set_tx_trigger_fscc(struct fc_port *port, unsigned value)
+int fastcom_set_tx_trigger_fscc(struct serialfc_port *port, unsigned value)
 {
     unsigned char orig_lcr;
 
@@ -197,7 +197,7 @@ int fastcom_set_tx_trigger_fscc(struct fc_port *port, unsigned value)
     return 0;
 }
 
-int fastcom_set_tx_trigger(struct fc_port *port, unsigned value)
+int fastcom_set_tx_trigger(struct serialfc_port *port, unsigned value)
 {
     int status;
 
@@ -227,7 +227,7 @@ int fastcom_set_tx_trigger(struct fc_port *port, unsigned value)
     return status;
 }
 
-void fastcom_get_tx_trigger_fscc(struct fc_port *port, unsigned *value)
+void fastcom_get_tx_trigger_fscc(struct serialfc_port *port, unsigned *value)
 {
     unsigned char orig_lcr;
     unsigned char ttl;
@@ -248,7 +248,7 @@ void fastcom_get_tx_trigger_fscc(struct fc_port *port, unsigned *value)
     iowrite8(orig_lcr, port->addr + LCR_OFFSET); /* Ensure last LCR value is not 0xbf */
 }
 
-int fastcom_get_tx_trigger(struct fc_port *port, unsigned *value)
+int fastcom_get_tx_trigger(struct serialfc_port *port, unsigned *value)
 {
     switch (fastcom_get_card_type(port)) {
     case CARD_TYPE_PCI:
@@ -267,7 +267,7 @@ int fastcom_get_tx_trigger(struct fc_port *port, unsigned *value)
     return 0;
 }
 
-int fastcom_set_rx_trigger_pci(struct fc_port *port, unsigned value)
+int fastcom_set_rx_trigger_pci(struct serialfc_port *port, unsigned value)
 {
     if (value > 64)
         return -EINVAL;
@@ -277,7 +277,7 @@ int fastcom_set_rx_trigger_pci(struct fc_port *port, unsigned value)
     return 0;
 }
 
-int fastcom_set_rx_trigger_pcie(struct fc_port *port, unsigned value)
+int fastcom_set_rx_trigger_pcie(struct serialfc_port *port, unsigned value)
 {
     if (value > 255)
         return -EINVAL;
@@ -287,7 +287,7 @@ int fastcom_set_rx_trigger_pcie(struct fc_port *port, unsigned value)
     return 0;
 }
 
-int fastcom_set_rx_trigger_fscc(struct fc_port *port, unsigned value)
+int fastcom_set_rx_trigger_fscc(struct serialfc_port *port, unsigned value)
 {
     unsigned char orig_lcr;
 
@@ -305,7 +305,7 @@ int fastcom_set_rx_trigger_fscc(struct fc_port *port, unsigned value)
     return 0;
 }
 
-int fastcom_set_rx_trigger(struct fc_port *port, unsigned value)
+int fastcom_set_rx_trigger(struct serialfc_port *port, unsigned value)
 {
     int status;
 
@@ -336,7 +336,7 @@ int fastcom_set_rx_trigger(struct fc_port *port, unsigned value)
     return status;
 }
 
-void fastcom_get_rx_trigger_fscc(struct fc_port *port, unsigned *value)
+void fastcom_get_rx_trigger_fscc(struct serialfc_port *port, unsigned *value)
 {
     unsigned char orig_lcr;
     unsigned char rtl;
@@ -357,7 +357,7 @@ void fastcom_get_rx_trigger_fscc(struct fc_port *port, unsigned *value)
     iowrite8(orig_lcr, port->addr + LCR_OFFSET); /* Ensure last LCR value is not 0xbf */
 }
 
-int fastcom_get_rx_trigger(struct fc_port *port, unsigned *value)
+int fastcom_get_rx_trigger(struct serialfc_port *port, unsigned *value)
 {
     switch (fastcom_get_card_type(port)) {
     case CARD_TYPE_PCI:
@@ -376,7 +376,7 @@ int fastcom_get_rx_trigger(struct fc_port *port, unsigned *value)
     return 0;
 }
 
-void fastcom_set_rs485_pci(struct fc_port *port, int enable)
+void fastcom_set_rs485_pci(struct serialfc_port *port, int enable)
 {
     unsigned char current_mcr, new_mcr;
     unsigned char current_fctr, new_fctr;
@@ -402,7 +402,7 @@ void fastcom_set_rs485_pci(struct fc_port *port, int enable)
     iowrite8(new_fctr, port->addr + UART_EXAR_FCTR);
 }
 
-void fastcom_set_rs485_pcie(struct fc_port *port, int enable)
+void fastcom_set_rs485_pcie(struct serialfc_port *port, int enable)
 {
     unsigned char current_mcr, new_mcr;
     unsigned char current_fctr, new_fctr;
@@ -424,7 +424,7 @@ void fastcom_set_rs485_pcie(struct fc_port *port, int enable)
 }
 
 //TODO: Needs FCR changes
-void fastcom_set_rs485_fscc(struct fc_port *port, int enable)
+void fastcom_set_rs485_fscc(struct serialfc_port *port, int enable)
 {
     unsigned char orig_lcr;
 
@@ -443,7 +443,7 @@ void fastcom_set_rs485_fscc(struct fc_port *port, int enable)
     iowrite8(orig_lcr, port->addr + LCR_OFFSET);
 }
 
-int fastcom_set_rs485(struct fc_port *port, int enable)
+int fastcom_set_rs485(struct serialfc_port *port, int enable)
 {
     switch (fastcom_get_card_type(port)) {
     case CARD_TYPE_PCI:
@@ -467,7 +467,7 @@ int fastcom_set_rs485(struct fc_port *port, int enable)
     return 0;
 }
 
-void fastcom_get_rs485_pci(struct fc_port *port, int *enabled)
+void fastcom_get_rs485_pci(struct serialfc_port *port, int *enabled)
 {
     unsigned char current_fctr;
 
@@ -477,12 +477,12 @@ void fastcom_get_rs485_pci(struct fc_port *port, int *enabled)
 }
 
 //TODO: Needs FCR changes
-void fastcom_get_rs485_fscc(struct fc_port *port, int *enabled)
+void fastcom_get_rs485_fscc(struct serialfc_port *port, int *enabled)
 {
     *enabled = (port->ACR & 0x10) ? 1 : 0;
 }
 
-int fastcom_get_rs485(struct fc_port *port, int *enabled)
+int fastcom_get_rs485(struct serialfc_port *port, int *enabled)
 {
     switch (fastcom_get_card_type(port)) {
     case CARD_TYPE_PCI:
@@ -499,17 +499,17 @@ int fastcom_get_rs485(struct fc_port *port, int *enabled)
     }
 }
 
-void fastcom_enable_rs485(struct fc_port *port)
+void fastcom_enable_rs485(struct serialfc_port *port)
 {
     fastcom_set_rs485(port, 1);
 }
 
-void fastcom_disable_rs485(struct fc_port *port)
+void fastcom_disable_rs485(struct serialfc_port *port)
 {
     fastcom_set_rs485(port, 0);
 }
 
-int fastcom_set_isochronous_fscc(struct fc_port *port, int mode)
+int fastcom_set_isochronous_fscc(struct serialfc_port *port, int mode)
 {
     unsigned char orig_lcr;
     unsigned char new_cks = 0;
@@ -573,7 +573,7 @@ int fastcom_set_isochronous_fscc(struct fc_port *port, int mode)
     return 0;
 }
 
-void fastcom_get_isochronous_fscc(struct fc_port *port, int *mode)
+void fastcom_get_isochronous_fscc(struct serialfc_port *port, int *mode)
 {
     unsigned char orig_lcr;
     unsigned char cks;
@@ -634,7 +634,7 @@ void fastcom_get_isochronous_fscc(struct fc_port *port, int *mode)
     iowrite8(orig_lcr, port->addr + LCR_OFFSET); /* Ensure last LCR value is not 0xbf */
 }
 
-int fastcom_set_isochronous(struct fc_port *port, int mode)
+int fastcom_set_isochronous(struct serialfc_port *port, int mode)
 {
     int status;
 
@@ -654,7 +654,7 @@ int fastcom_set_isochronous(struct fc_port *port, int mode)
     return status;
 }
 
-int fastcom_get_isochronous(struct fc_port *port, int *mode)
+int fastcom_get_isochronous(struct serialfc_port *port, int *mode)
 {
     switch (fastcom_get_card_type(port)) {
     case CARD_TYPE_FSCC:
@@ -666,17 +666,17 @@ int fastcom_get_isochronous(struct fc_port *port, int *mode)
     }
 }
 
-int fastcom_enable_isochronous(struct fc_port *port, unsigned mode)
+int fastcom_enable_isochronous(struct serialfc_port *port, unsigned mode)
 {
     return fastcom_set_isochronous(port, mode);
 }
 
-int fastcom_disable_isochronous(struct fc_port *port)
+int fastcom_disable_isochronous(struct serialfc_port *port)
 {
     return fastcom_set_isochronous(port, -1);
 }
 
-void fastcom_set_termination_pcie(struct fc_port *port, int enable)
+void fastcom_set_termination_pcie(struct serialfc_port *port, int enable)
 {
     unsigned char current_mpio_lvlh, new_mpio_lvlh;
 
@@ -690,7 +690,7 @@ void fastcom_set_termination_pcie(struct fc_port *port, int enable)
     iowrite8(new_mpio_lvlh, port->addr + MPIOLVLH_OFFSET);
 }
 
-void fastcom_get_termination_pcie(struct fc_port *port, int *enabled)
+void fastcom_get_termination_pcie(struct serialfc_port *port, int *enabled)
 {
     unsigned char mpio_lvlh;
 
@@ -699,7 +699,7 @@ void fastcom_get_termination_pcie(struct fc_port *port, int *enabled)
     *enabled = mpio_lvlh & (0x1 << port->channel) ? 1 : 0;
 }
 
-int fastcom_set_termination(struct fc_port *port, int enable)
+int fastcom_set_termination(struct serialfc_port *port, int enable)
 {
     int status;
 
@@ -720,7 +720,7 @@ int fastcom_set_termination(struct fc_port *port, int enable)
     return status;
 }
 
-int fastcom_get_termination(struct fc_port *port, int *enabled)
+int fastcom_get_termination(struct serialfc_port *port, int *enabled)
 {
     switch (fastcom_get_card_type(port)) {
     case CARD_TYPE_PCIe:
@@ -732,17 +732,17 @@ int fastcom_get_termination(struct fc_port *port, int *enabled)
     }
 }
 
-int fastcom_enable_termination(struct fc_port *port)
+int fastcom_enable_termination(struct serialfc_port *port)
 {
     return fastcom_set_termination(port, 1);
 }
 
-int fastcom_disable_termination(struct fc_port *port)
+int fastcom_disable_termination(struct serialfc_port *port)
 {
     return fastcom_set_termination(port, 0);
 }
 
-void fastcom_set_echo_cancel_pci(struct fc_port *port, int enable)
+void fastcom_set_echo_cancel_pci(struct serialfc_port *port, int enable)
 {
     unsigned char current_mpio_lvl, new_mpio_lvl;
 
@@ -756,7 +756,7 @@ void fastcom_set_echo_cancel_pci(struct fc_port *port, int enable)
     iowrite8(new_mpio_lvl, port->addr + MPIOLVL_OFFSET);
 }
 
-void fastcom_set_echo_cancel_pcie(struct fc_port *port, int enable)
+void fastcom_set_echo_cancel_pcie(struct serialfc_port *port, int enable)
 {
     unsigned char current_mpio_lvl, new_mpio_lvl;
 
@@ -770,7 +770,7 @@ void fastcom_set_echo_cancel_pcie(struct fc_port *port, int enable)
     iowrite8(new_mpio_lvl, port->addr + MPIOLVL_OFFSET);
 }
 
-void fastcom_set_echo_cancel_fscc(struct fc_port *port, int enable)
+void fastcom_set_echo_cancel_fscc(struct serialfc_port *port, int enable)
 {
 #if 0
     UINT32 current_fcr, new_fcr;
@@ -797,7 +797,7 @@ void fastcom_set_echo_cancel_fscc(struct fc_port *port, int enable)
 #endif
 }
 
-void fastcom_set_echo_cancel(struct fc_port *port, int enable)
+void fastcom_set_echo_cancel(struct serialfc_port *port, int enable)
 {
     switch (fastcom_get_card_type(port)) {
     case CARD_TYPE_PCI:
@@ -819,17 +819,17 @@ void fastcom_set_echo_cancel(struct fc_port *port, int enable)
 	dev_info(port->device, "Echo cancel = %i\n", enable);
 }
 
-void fastcom_enable_echo_cancel(struct fc_port *port)
+void fastcom_enable_echo_cancel(struct serialfc_port *port)
 {
     fastcom_set_echo_cancel(port, 1);
 }
 
-void fastcom_disable_echo_cancel(struct fc_port *port)
+void fastcom_disable_echo_cancel(struct serialfc_port *port)
 {
     fastcom_set_echo_cancel(port, 0);
 }
 
-void fastcom_get_echo_cancel_pci(struct fc_port *port, int *enabled)
+void fastcom_get_echo_cancel_pci(struct serialfc_port *port, int *enabled)
 {
     unsigned char mpio_lvl;
 
@@ -838,7 +838,7 @@ void fastcom_get_echo_cancel_pci(struct fc_port *port, int *enabled)
     *enabled = mpio_lvl & 0x80 ? 1 : 0;
 }
 
-void fastcom_get_echo_cancel_pcie(struct fc_port *port, int *enabled)
+void fastcom_get_echo_cancel_pcie(struct serialfc_port *port, int *enabled)
 {
     unsigned char mpio_lvl;
 
@@ -847,7 +847,7 @@ void fastcom_get_echo_cancel_pcie(struct fc_port *port, int *enabled)
     *enabled = mpio_lvl & (0x1 << port->channel) ? 1 : 0;
 }
 
-void fastcom_get_echo_cancel_fscc(struct fc_port *port, int *enabled)
+void fastcom_get_echo_cancel_fscc(struct serialfc_port *port, int *enabled)
 {
 #if 0
     UINT32 fcr;
@@ -869,7 +869,7 @@ void fastcom_get_echo_cancel_fscc(struct fc_port *port, int *enabled)
 #endif
 }
 
-void fastcom_get_echo_cancel(struct fc_port *port, int *enabled)
+void fastcom_get_echo_cancel(struct serialfc_port *port, int *enabled)
 {
     switch (fastcom_get_card_type(port)) {
     case CARD_TYPE_PCI:
@@ -1747,7 +1747,7 @@ then choose the best loop filter with
 #define DTA_BASE 0x00000001
 #define CLK_BASE 0x00000002
 
-int FastcomSetClockRateFSCC(struct fc_port *port, unsigned value)
+int FastcomSetClockRateFSCC(struct serialfc_port *port, unsigned value)
 {
     UINT32 orig_fcr_value = 0;
     UINT32 new_fcr_value = 0;
@@ -1841,7 +1841,7 @@ int FastcomSetClockRateFSCC(struct fc_port *port, unsigned value)
 #define MPIO_SSTB           0x04
 
 //WILL: Range 6MHz - 200MHz
-int FastcomSetClockRatePCI(struct fc_port *port, unsigned rate)
+int FastcomSetClockRatePCI(struct serialfc_port *port, unsigned rate)
 {
     #define STARTWRD 0x1e05
     #define MIDWRD   0x1e04
@@ -2137,7 +2137,7 @@ int FastcomSetClockRatePCI(struct fc_port *port, unsigned rate)
 }
 #endif
 
-int pcie_set_baud_rate(struct fc_port *port, unsigned value)
+int pcie_set_baud_rate(struct serialfc_port *port, unsigned value)
 {
     const unsigned input_freq = 125000000;
     const unsigned prescaler = 1;
@@ -2169,7 +2169,7 @@ int pcie_set_baud_rate(struct fc_port *port, unsigned value)
     return 0;
 }
 
-int fastcom_set_clock_rate(struct fc_port *port, unsigned value)
+int fastcom_set_clock_rate(struct serialfc_port *port, unsigned value)
 {
     int status;
 
@@ -2196,7 +2196,7 @@ int fastcom_set_clock_rate(struct fc_port *port, unsigned value)
     return status;
 }
 
-int fastcom_set_external_transmit_fscc(struct fc_port *port, unsigned num_chars)
+int fastcom_set_external_transmit_fscc(struct serialfc_port *port, unsigned num_chars)
 {
     unsigned char orig_lcr;
 
@@ -2227,7 +2227,7 @@ int fastcom_set_external_transmit_fscc(struct fc_port *port, unsigned num_chars)
     return 0;
 }
 
-void fastcom_get_external_transmit_fscc(struct fc_port *port, unsigned *num_chars)
+void fastcom_get_external_transmit_fscc(struct serialfc_port *port, unsigned *num_chars)
 {
     unsigned char orig_lcr;
     unsigned char ext, exth;
@@ -2251,7 +2251,7 @@ void fastcom_get_external_transmit_fscc(struct fc_port *port, unsigned *num_char
     iowrite8(orig_lcr, port->addr + LCR_OFFSET);
 }
 
-int fastcom_get_external_transmit(struct fc_port *port, unsigned *num_chars)
+int fastcom_get_external_transmit(struct serialfc_port *port, unsigned *num_chars)
 {
     switch (fastcom_get_card_type(port)) {
     case CARD_TYPE_FSCC:
@@ -2265,7 +2265,7 @@ int fastcom_get_external_transmit(struct fc_port *port, unsigned *num_chars)
     return 0;
 }
 
-int fastcom_set_external_transmit(struct fc_port *port, unsigned num_chars)
+int fastcom_set_external_transmit(struct serialfc_port *port, unsigned num_chars)
 {
     int status;
 
@@ -2284,17 +2284,17 @@ int fastcom_set_external_transmit(struct fc_port *port, unsigned num_chars)
     return status;
 }
 
-int fastcom_enable_external_transmit(struct fc_port *port, unsigned num_chars)
+int fastcom_enable_external_transmit(struct serialfc_port *port, unsigned num_chars)
 {
     return fastcom_set_external_transmit(port, num_chars);
 }
 
-int fastcom_disable_external_transmit(struct fc_port *port)
+int fastcom_disable_external_transmit(struct serialfc_port *port)
 {
     return fastcom_set_external_transmit(port, 0);
 }
 
-int fastcom_set_frame_length_fscc(struct fc_port *port, unsigned num_chars)
+int fastcom_set_frame_length_fscc(struct serialfc_port *port, unsigned num_chars)
 {
     unsigned char orig_lcr;
 
@@ -2312,7 +2312,7 @@ int fastcom_set_frame_length_fscc(struct fc_port *port, unsigned num_chars)
     return 0;
 }
 
-void fastcom_get_frame_length_fscc(struct fc_port *port, unsigned *num_chars)
+void fastcom_get_frame_length_fscc(struct serialfc_port *port, unsigned *num_chars)
 {
     unsigned char orig_lcr;
     unsigned char flr;
@@ -2333,7 +2333,7 @@ void fastcom_get_frame_length_fscc(struct fc_port *port, unsigned *num_chars)
     iowrite8(orig_lcr, port->addr + LCR_OFFSET);
 }
 
-int fastcom_set_frame_length(struct fc_port *port, unsigned num_chars)
+int fastcom_set_frame_length(struct serialfc_port *port, unsigned num_chars)
 {
     int status;
 
@@ -2352,7 +2352,7 @@ int fastcom_set_frame_length(struct fc_port *port, unsigned num_chars)
     return status;
 }
 
-int fastcom_get_frame_length(struct fc_port *port, unsigned *num_chars)
+int fastcom_get_frame_length(struct serialfc_port *port, unsigned *num_chars)
 {
     switch (fastcom_get_card_type(port)) {
     case CARD_TYPE_FSCC:
@@ -2366,7 +2366,7 @@ int fastcom_get_frame_length(struct fc_port *port, unsigned *num_chars)
     return 0;
 }
 
-int fastcom_set_9bit(struct fc_port *port, int enable)
+int fastcom_set_9bit(struct serialfc_port *port, int enable)
 {
     int status;
 
@@ -2382,7 +2382,7 @@ int fastcom_set_9bit(struct fc_port *port, int enable)
     return status;
 }
 
-int fastcom_get_9bit(struct fc_port *port, int *enabled)
+int fastcom_get_9bit(struct serialfc_port *port, int *enabled)
 {
     switch (fastcom_get_card_type(port)) {
     //TODO
@@ -2392,12 +2392,12 @@ int fastcom_get_9bit(struct fc_port *port, int *enabled)
     }
 }
 
-int fastcom_enable_9bit(struct fc_port *port)
+int fastcom_enable_9bit(struct serialfc_port *port)
 {
     return fastcom_set_9bit(port, 1);
 }
 
-int fastcom_disable_9bit(struct fc_port *port)
+int fastcom_disable_9bit(struct serialfc_port *port)
 {
     return fastcom_set_9bit(port, 0);
 }

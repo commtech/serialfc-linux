@@ -49,9 +49,9 @@ struct pci_device_id fc_id_table[] = {
 
 int serialfc_open(struct inode *inode, struct file *file)
 {
-	struct fc_port *current_port = 0;
+	struct serialfc_port *current_port = 0;
 
-	current_port = container_of(inode->i_cdev, struct fc_port, cdev);
+	current_port = container_of(inode->i_cdev, struct serialfc_port, cdev);
 	file->private_data = current_port;
 
 	return 0;
@@ -64,7 +64,7 @@ int serialfc_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 			       unsigned long arg)
 #endif
 {
-    struct fc_port *port = 0;
+    struct serialfc_port *port = 0;
 	int error_code = 0;
 
 	port = file->private_data;

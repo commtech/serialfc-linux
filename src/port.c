@@ -7,12 +7,12 @@
 #include "config.h"
 #include "utils.h"
 
-struct fc_port *fc_port_new(struct serialfc_card *card, unsigned channel,
+struct serialfc_port *serialfc_port_new(struct serialfc_card *card, unsigned channel,
 							unsigned major_number, unsigned minor_number,
                             void __iomem *addr, struct device *parent, struct class *class,
 							struct file_operations *fops)
 {
-	struct fc_port *port = 0;
+	struct serialfc_port *port = 0;
 	unsigned default_clock_rate = 1843200;
 	unsigned i = 0;
 
@@ -163,7 +163,7 @@ struct fc_port *fc_port_new(struct serialfc_card *card, unsigned channel,
 	return port;
 }
 
-void fc_port_delete(struct fc_port *port)
+void serialfc_port_delete(struct serialfc_port *port)
 {
 	return_if_untrue(port);
 
