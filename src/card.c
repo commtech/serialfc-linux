@@ -55,10 +55,12 @@ struct pciserial_board fc_8_pcie_board = {
 	.first_offset = 0,
 };
 
-struct fc_card *fc_card_new(struct pci_dev *pdev, unsigned major_number,
-							struct class *class, struct file_operations *fops)
+struct serialfc_card *serialfc_card_new(struct pci_dev *pdev,
+                                        unsigned major_number,
+							            struct class *class,
+							            struct file_operations *fops)
 {
-	struct fc_card *card = 0;
+	struct serialfc_card *card = 0;
 	struct fc_port *port_iter = 0;
 	struct pciserial_board *board = 0;
 	static unsigned minor_number = 0;
@@ -129,7 +131,7 @@ struct fc_card *fc_card_new(struct pci_dev *pdev, unsigned major_number,
 	return card;
 }
 
-void fc_card_delete(struct fc_card *card)
+void serialfc_card_delete(struct serialfc_card *card)
 {
 	struct list_head *current_node = 0;
 	struct list_head *temp_node = 0;

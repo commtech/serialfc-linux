@@ -32,10 +32,10 @@
 static int serialfc_major_number;
 static struct class *serialfc_class = 0;
 
-struct fc_card *fc_card_find(struct pci_dev *pdev,
-                                   struct list_head *card_list);
+struct serialfc_card *serialfc_card_find(struct pci_dev *pdev,
+                                         struct list_head *card_list);
 
-LIST_HEAD(fc_cards);
+LIST_HEAD(serialfc_cards);
 
 struct pci_device_id fc_id_table[] = {
 	{ COMMTECH_VENDOR_ID, FC_422_2_PCI_335_ID, PCI_ANY_ID, 0, 0, 0 },
@@ -200,34 +200,33 @@ static struct file_operations serialfc_fops = {
 #endif
 };
 
-static int fc_probe(struct pci_dev *pdev,
-                                   const struct pci_device_id *id)
+static int fc_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 {
-	struct fc_card *new_card = 0;
+	struct serialfc_card *new_card = 0;
 
 	if (pci_enable_device(pdev))
 		return -EIO;
 
-	new_card = fc_card_new(pdev, serialfc_major_number, serialfc_class,
-						   &serialfc_fops);
+	new_card = serialfc_card_new(pdev, serialfc_major_number, serialfc_class,
+						         &serialfc_fops);
 
 	if (new_card)
-		list_add_tail(&new_card->list, &fc_cards);
+		list_add_tail(&new_card->list, &serialfc_cards);
 
 	return 0;
 }
 
 static void fc_remove(struct pci_dev *pdev)
 {
-	struct fc_card *card = 0;
+	struct serialfc_card *card = 0;
 
-	card = fc_card_find(pdev, &fc_cards);
+	card = serialfc_card_find(pdev, &serialfc_cards);
 
 	if (card == 0)
 		return;
 
 	list_del(&card->list);
-	fc_card_delete(card);
+	serialfc_card_delete(card);
 
 	pci_disable_device(pdev);
 }
@@ -243,7 +242,7 @@ static int __init fc_init(void)
 {
 	unsigned error_code = 0;
 	unsigned num_devices = 0;
-	struct fc_card *new_card = 0;
+	struct serialfc_card *new_card = 0;
 
 	serialfc_class = class_create(THIS_MODULE, DEVICE_NAME);
 
@@ -278,11 +277,11 @@ static int __init fc_init(void)
 		if (pci_enable_device(pdev))
 			return -EIO;
 
-		new_card = fc_card_new(pdev, serialfc_major_number, serialfc_class,
-						   &serialfc_fops);
+		new_card = serialfc_card_new(pdev, serialfc_major_number,
+		                             serialfc_class, &serialfc_fops);
 
 		if (new_card)
-			list_add_tail(&new_card->list, &fc_cards);
+			list_add_tail(&new_card->list, &serialfc_cards);
 
 		num_devices = 1;
 /*
@@ -295,10 +294,10 @@ static int __init fc_init(void)
 			if (pci_enable_device(pdev))
 				return -EIO;
 
-			new_card = fc_card_new(pdev);
+			new_card = serialfc_card_new(pdev);
 
 			if (new_card)
-				list_add_tail(&new_card->list, &fc_cards);
+				list_add_tail(&new_card->list, &serialfc_cards);
 		}
 */
 		if (num_devices == 0) {
@@ -315,13 +314,13 @@ static void __exit fc_exit(void)
 	struct list_head *current_node = 0;
 	struct list_head *temp_node = 0;
 
-	list_for_each_safe(current_node, temp_node, &fc_cards) {
-		struct fc_card *current_card = 0;
+	list_for_each_safe(current_node, temp_node, &serialfc_cards) {
+		struct serialfc_card *current_card = 0;
 
-		current_card = list_entry(current_node, struct fc_card, list);
+		current_card = list_entry(current_node, struct serialfc_card, list);
 
 		list_del(current_node);
-		fc_card_delete(current_card);
+		serialfc_card_delete(current_card);
 	}
 
 
@@ -331,10 +330,10 @@ static void __exit fc_exit(void)
 	class_destroy(serialfc_class);
 }
 
-struct fc_card *fc_card_find(struct pci_dev *pdev,
-                                  struct list_head *card_list)
+struct serialfc_card *serialfc_card_find(struct pci_dev *pdev,
+                                         struct list_head *card_list)
 {
-	struct fc_card *current_card = 0;
+	struct serialfc_card *current_card = 0;
 
 	return_val_if_untrue(pdev, 0);
 	return_val_if_untrue(card_list, 0);

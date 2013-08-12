@@ -36,7 +36,7 @@ struct fc_port {
 	char *name;
 	void __iomem *addr;
 	unsigned channel;
-	struct fc_card *card;
+	struct serialfc_card *card;
 	unsigned sample_rate;
 	unsigned clock_rate;
 	unsigned char ACR;
@@ -44,7 +44,7 @@ struct fc_port {
 	unsigned rx_trigger;
 };
 
-struct fc_port *fc_port_new(struct fc_card *card, unsigned channel,
+struct fc_port *fc_port_new(struct serialfc_card *card, unsigned channel,
 							unsigned major_number, unsigned minor_number,
                             void __iomem *addr, struct device *parent,
                             struct class *class, struct file_operations *fops);

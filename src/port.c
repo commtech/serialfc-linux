@@ -7,7 +7,7 @@
 #include "config.h"
 #include "utils.h"
 
-struct fc_port *fc_port_new(struct fc_card *card, unsigned channel,
+struct fc_port *fc_port_new(struct serialfc_card *card, unsigned channel,
 							unsigned major_number, unsigned minor_number,
                             void __iomem *addr, struct device *parent, struct class *class,
 							struct file_operations *fops)

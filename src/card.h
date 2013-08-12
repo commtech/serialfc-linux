@@ -24,7 +24,7 @@
 #include <linux/list.h>
 #include <linux/8250_pci.h> /* struct serial_private */
 
-struct fc_card {
+struct serialfc_card {
 	struct list_head list;
 	struct list_head ports;
 	struct pci_dev *pci_dev;
@@ -32,8 +32,10 @@ struct fc_card {
 	void __iomem *addr;
 };
 
-struct fc_card *fc_card_new(struct pci_dev *pdev, unsigned major_number,
-							struct class *class, struct file_operations *fops);
-void fc_card_delete(struct fc_card *card);
+struct serialfc_card *serialfc_card_new(struct pci_dev *pdev,
+                                        unsigned major_number,
+							            struct class *class,
+							            struct file_operations *fops);
+void serialfc_card_delete(struct serialfc_card *card);
 
 #endif
