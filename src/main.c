@@ -238,7 +238,7 @@ struct pci_driver fc_pci_driver = {
 	.id_table = fc_id_table,
 };
 
-static int __init fc_init(void)
+static int __init serialfc_init(void)
 {
 	unsigned error_code = 0;
 	unsigned num_devices = 0;
@@ -267,49 +267,42 @@ static int __init fc_init(void)
 		class_destroy(serialfc_class);
 		return error_code;
 	}
-//#if 0
-    //Temporary since probe doesn't get called above 3.8
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0)
 	if (error_code == 0) {
 		struct pci_dev *pdev = NULL;
 
 		pdev = pci_get_device(COMMTECH_VENDOR_ID, PCI_ANY_ID, pdev);
 
-		if (pci_enable_device(pdev))
-			return -EIO;
-
-		new_card = serialfc_card_new(pdev, serialfc_major_number,
-		                             serialfc_class, &serialfc_fops);
-
-		if (new_card)
-			list_add_tail(&new_card->list, &serialfc_cards);
-
-		num_devices = 1;
-/*
 		while (pdev != NULL) {
-			if (is_serialfc_device(pdev))
+			if (is_serialfc_device(pdev)) {
 				++num_devices;
 
+			    if (pci_enable_device(pdev))
+				    return -EIO;
+
+			    new_card = serialfc_card_new(pdev, serialfc_major_number,
+			                                 serialfc_class, &serialfc_fops);
+
+			    if (new_card)
+				    list_add_tail(&new_card->list, &serialfc_cards);
+	        }
+
 			pdev = pci_get_device(COMMTECH_VENDOR_ID, PCI_ANY_ID, pdev);
-
-			if (pci_enable_device(pdev))
-				return -EIO;
-
-			new_card = serialfc_card_new(pdev);
-
-			if (new_card)
-				list_add_tail(&new_card->list, &serialfc_cards);
 		}
-*/
+
 		if (num_devices == 0) {
 			pci_unregister_driver(&fc_pci_driver);
+		    unregister_chrdev(serialfc_major_number, "serialfc");
+		    class_destroy(serialfc_class);
 			return -ENODEV;
 		}
 	}
-//#endif
+#endif
 	return 0;
 }
 
-static void __exit fc_exit(void)
+static void __exit serialfc_exit(void)
 {
 	struct list_head *current_node = 0;
 	struct list_head *temp_node = 0;
@@ -322,8 +315,6 @@ static void __exit fc_exit(void)
 		list_del(current_node);
 		serialfc_card_delete(current_card);
 	}
-
-
 
 	pci_unregister_driver(&fc_pci_driver);
 	unregister_chrdev(serialfc_major_number, DEVICE_NAME);
@@ -353,5 +344,5 @@ MODULE_AUTHOR("William Fagan <willf@commtech-fastcom.com>");
 MODULE_DESCRIPTION("Registers the UARTs on the async series of Commtech cards "\
                    "with the serial driver.");
 
-module_init(fc_init);
-module_exit(fc_exit);
+module_init(serialfc_init);
+module_exit(serialfc_exit);
