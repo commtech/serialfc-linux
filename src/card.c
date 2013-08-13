@@ -55,6 +55,13 @@ struct pciserial_board fc_8_pcie_board = {
 	.first_offset = 0,
 };
 
+struct pciserial_board fscc_board = {
+	.flags = FL_BASE1,
+	.num_ports = 2,
+	.base_baud = 1152000,
+	.uart_offset = 8,
+};
+
 struct serialfc_card *serialfc_card_new(struct pci_dev *pdev,
                                         unsigned major_number,
 							            struct class *class,
@@ -96,22 +103,61 @@ struct serialfc_card *serialfc_card_new(struct pci_dev *pdev,
 	case FC_422_8_PCIe_ID:
 		board = &fc_8_pcie_board;
 		break;
+
+	case FSCC_ID:
+	case SFSCC_ID:
+	case SFSCC_104_LVDS_ID:
+	case FSCC_232_ID:
+	case SFSCC_104_UA_ID:
+	case SFSCC_4_UA_ID:
+	case SFSCC_UA_ID:
+	case SFSCC_LVDS_ID:
+	case FSCC_4_UA_ID:
+	case SFSCC_4_LVDS_ID:
+	case FSCC_UA_ID:
+	case SFSCCe_4_ID:
+	case SFSCC_4_UA_CPCI_ID:
+	case SFSCC_4_UA_LVDS_ID:
+	case SFSCC_UA_LVDS_ID:
+		board = &fscc_board;
+		break;
 	}
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 8, 0)
-	card->serial_priv = pciserial_init_ports(pdev, board);
+	card->serial_priv = 0;
 
-	if (IS_ERR(card->serial_priv)) {
-		dev_err(&card->pci_dev->dev, "pciserial_init_ports failed\n");
+	if (fastcom_get_card_type2(card) == CARD_TYPE_FSCC) {
+	    card->serial_priv = pciserial_init_ports(pdev, board);
+
+	    if (IS_ERR(card->serial_priv)) {
+		    dev_err(&card->pci_dev->dev, "pciserial_init_ports failed\n");
+		    return 0;
+	    }
+	}
+	else {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 8, 0)
+	    card->serial_priv = pciserial_init_ports(pdev, board);
+
+	    if (IS_ERR(card->serial_priv)) {
+		    dev_err(&card->pci_dev->dev, "pciserial_init_ports failed\n");
+		    return 0;
+	    }
+#endif
+    }
+
+	if (fastcom_get_card_type2(card) == CARD_TYPE_FSCC)
+	    card->addr = pci_iomap(card->pci_dev, 1, 0);
+	else
+	    card->addr = pci_iomap(card->pci_dev, 0, 0);
+
+	if (card->addr == NULL) {
+		dev_err(&card->pci_dev->dev, "pci_iomap failed\n");
 		return 0;
 	}
 
-	pci_set_drvdata(pdev, card->serial_priv);
-#endif
+	if (fastcom_get_card_type2(card) == CARD_TYPE_FSCC)
+	    card->bar2 = pci_iomap(card->pci_dev, 2, 0);
 
-	card->addr = pci_iomap(card->pci_dev, 0, 0);
-
-	if (card->addr == NULL) {
+	if (card->bar2 == NULL) {
 		dev_err(&card->pci_dev->dev, "pci_iomap failed\n");
 		return 0;
 	}
@@ -147,11 +193,56 @@ void serialfc_card_delete(struct serialfc_card *card)
 		serialfc_port_delete(current_port);
 	}
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 8, 0)
-	pciserial_remove_ports(card->serial_priv);
-#endif
-
-	pci_set_drvdata(card->pci_dev, NULL);
+	if (card->serial_priv)
+	    pciserial_remove_ports(card->serial_priv);
 
 	kfree(card);
+}
+
+char *serialfc_card_get_name(struct serialfc_card *card)
+{
+	switch (card->pci_dev->device) {
+    case FC_422_2_PCI_335_ID:
+		return "422/2-PCI-335";
+    case FC_422_4_PCI_335_ID:
+		return "422/4-PCI-335";
+    case FC_232_4_PCI_335_ID:
+		return "232/4-PCI-335";
+    case FC_232_8_PCI_335_ID:
+		return "232/8-PCI-335";
+    case FC_422_4_PCIe_ID:
+		return "422/4-PCIe";
+    case FC_422_8_PCIe_ID:
+		return "422/8-PCIe";
+	case FSCC_ID:
+	case FSCC_UA_ID:
+		return "FSCC PCI";
+	case SFSCC_ID:
+	case SFSCC_UA_ID:
+		return "SuperFSCC PCI";
+	case SFSCC_104_LVDS_ID:
+		return "SuperFSCC-104-LVDS PC/104+";
+	case FSCC_232_ID:
+		return "FSCC-232 PCI";
+	case SFSCC_104_UA_ID:
+		return "SuperFSCC-104 PC/104+";
+	case SFSCC_4_UA_ID:
+		return "SuperFSCC/4 PCI";
+	case SFSCC_LVDS_ID:
+	case SFSCC_UA_LVDS_ID:
+		return "SuperFSCC-LVDS PCI";
+	case FSCC_4_UA_ID:
+		return "FSCC/4 PCI";
+	case SFSCC_4_LVDS_ID:
+	case SFSCC_4_UA_LVDS_ID:
+		return "SuperFSCC/4-LVDS PCI";
+	case SFSCCe_4_ID:
+		return "SuperFSCC/4 PCIe";
+	case SFSCC_4_CPCI_ID:
+	case SFSCC_4_UA_CPCI_ID:
+		return "SuperFSCC/4 cPCI";
+	default:
+		return "Unknown Device";
+	}
+
 }

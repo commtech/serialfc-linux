@@ -44,6 +44,22 @@ struct pci_device_id fc_id_table[] = {
 	{ COMMTECH_VENDOR_ID, FC_232_8_PCI_335_ID, PCI_ANY_ID, 0, 0, 0 },
 	{ COMMTECH_VENDOR_ID, FC_422_4_PCIe_ID, PCI_ANY_ID, 0, 0, 0 },
 	{ COMMTECH_VENDOR_ID, FC_422_8_PCIe_ID, PCI_ANY_ID, 0, 0, 0 },
+
+	{ COMMTECH_VENDOR_ID, FSCC_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, SFSCC_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, SFSCC_104_LVDS_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, FSCC_232_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, SFSCC_104_UA_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, SFSCC_4_UA_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, SFSCC_UA_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, SFSCC_LVDS_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, FSCC_4_UA_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, SFSCC_4_LVDS_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, FSCC_UA_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, SFSCCe_4_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, SFSCC_4_UA_CPCI_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, SFSCC_4_UA_LVDS_ID, PCI_ANY_ID, 0, 0, 0 },
+	{ COMMTECH_VENDOR_ID, SFSCC_UA_LVDS_ID, PCI_ANY_ID, 0, 0, 0 },
 	{ 0, },
 };
 
@@ -231,7 +247,7 @@ static void fc_remove(struct pci_dev *pdev)
 	pci_disable_device(pdev);
 }
 
-struct pci_driver fc_pci_driver = {
+struct pci_driver serialfc_pci_driver = {
 	.name = DEVICE_NAME,
 	.probe = fc_probe,
 	.remove = fc_remove,
@@ -259,7 +275,7 @@ static int __init serialfc_init(void)
 		return error_code;
 	}
 
-	error_code = pci_register_driver(&fc_pci_driver);
+	error_code = pci_register_driver(&serialfc_pci_driver);
 
 	if (error_code < 0) {
 		printk(KERN_ERR DEVICE_NAME " pci_register_driver failed");
@@ -292,7 +308,7 @@ static int __init serialfc_init(void)
 		}
 
 		if (num_devices == 0) {
-			pci_unregister_driver(&fc_pci_driver);
+			pci_unregister_driver(&serialfc_pci_driver);
 		    unregister_chrdev(serialfc_major_number, "serialfc");
 		    class_destroy(serialfc_class);
 			return -ENODEV;
@@ -316,7 +332,7 @@ static void __exit serialfc_exit(void)
 		serialfc_card_delete(current_card);
 	}
 
-	pci_unregister_driver(&fc_pci_driver);
+	pci_unregister_driver(&serialfc_pci_driver);
 	unregister_chrdev(serialfc_major_number, DEVICE_NAME);
 	class_destroy(serialfc_class);
 }

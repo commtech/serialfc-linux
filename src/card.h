@@ -30,6 +30,9 @@ struct serialfc_card {
 	struct pci_dev *pci_dev;
 	struct serial_private *serial_priv;
 	void __iomem *addr;
+
+	/* fscc only */
+	void __iomem *bar2;
 };
 
 struct serialfc_card *serialfc_card_new(struct pci_dev *pdev,
@@ -37,5 +40,6 @@ struct serialfc_card *serialfc_card_new(struct pci_dev *pdev,
 							            struct class *class,
 							            struct file_operations *fops);
 void serialfc_card_delete(struct serialfc_card *card);
+char *serialfc_card_get_name(struct serialfc_card *card);
 
 #endif

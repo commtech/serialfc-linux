@@ -160,6 +160,8 @@ struct serialfc_port *serialfc_port_new(struct serialfc_card *card, unsigned cha
 		return 0;
 	}
 
+	dev_info(port->device, "%s\n", serialfc_card_get_name(port->card));
+
 	return port;
 }
 

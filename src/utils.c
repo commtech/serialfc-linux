@@ -12,15 +12,30 @@ unsigned is_serialfc_device(struct pci_dev *pdev)
 		case FC_232_8_PCI_335_ID:
 		case FC_422_4_PCIe_ID:
 		case FC_422_8_PCIe_ID:
+		case FSCC_ID:
+		case SFSCC_ID:
+		case SFSCC_104_LVDS_ID:
+		case FSCC_232_ID:
+		case SFSCC_104_UA_ID:
+		case SFSCC_4_UA_ID:
+		case SFSCC_UA_ID:
+		case SFSCC_LVDS_ID:
+		case FSCC_4_UA_ID:
+		case SFSCC_4_LVDS_ID:
+		case FSCC_UA_ID:
+		case SFSCCe_4_ID:
+		case SFSCC_4_UA_CPCI_ID:
+		case SFSCC_4_UA_LVDS_ID:
+		case SFSCC_UA_LVDS_ID:
        		return 1;
 	}
 
 	return 0;
 }
 
-enum FASTCOM_CARD_TYPE fastcom_get_card_type(struct serialfc_port *port)
+enum FASTCOM_CARD_TYPE fastcom_get_card_type2(struct serialfc_card *card)
 {
-    switch (port->card->pci_dev->device) {
+    switch (card->pci_dev->device) {
     case FC_422_2_PCI_335_ID:
     case FC_422_4_PCI_335_ID:
     case FC_232_4_PCI_335_ID:
@@ -32,12 +47,17 @@ enum FASTCOM_CARD_TYPE fastcom_get_card_type(struct serialfc_port *port)
         return CARD_TYPE_PCIe;
     }
 
-    if (port->card->pci_dev->device == 0x0f ||
-        (port->card->pci_dev->device >= 0x14 && port->card->pci_dev->device <= 0x1F) ||
-        (port->card->pci_dev->device >= 0x22 && port->card->pci_dev->device <= 0x27))
+    if (card->pci_dev->device == 0x0f ||
+        (card->pci_dev->device >= 0x14 && card->pci_dev->device <= 0x1F) ||
+        (card->pci_dev->device >= 0x22 && card->pci_dev->device <= 0x27))
         return CARD_TYPE_FSCC;
 
     return CARD_TYPE_UNKNOWN;
+}
+
+enum FASTCOM_CARD_TYPE fastcom_get_card_type(struct serialfc_port *port)
+{
+    return fastcom_get_card_type2(port->card);
 }
 
 int fastcom_set_sample_rate_pci(struct serialfc_port *port, unsigned value)
@@ -146,7 +166,7 @@ int fastcom_set_sample_rate(struct serialfc_port *port, unsigned value)
     }
 
     if (status == 0) {
-	    dev_info(port->device, "Sample rate = %i\n", value);
+	    dev_dbg(port->device, "Sample rate = %i\n", value);
 
         port->sample_rate = value;
     }
@@ -219,7 +239,7 @@ int fastcom_set_tx_trigger(struct serialfc_port *port, unsigned value)
     }
 
     if (status == 0) {
-	    dev_info(port->device, "Transmit trigger level = %i\n", value);
+	    dev_dbg(port->device, "Transmit trigger level = %i\n", value);
 
         port->tx_trigger = value;
     }
@@ -328,7 +348,7 @@ int fastcom_set_rx_trigger(struct serialfc_port *port, unsigned value)
     }
 
     if (status == 0) {
-	    dev_info(port->device, "Receive trigger level = %i\n", value);
+	    dev_dbg(port->device, "Receive trigger level = %i\n", value);
 
         port->rx_trigger = value;
     }
@@ -427,18 +447,25 @@ void fastcom_set_rs485_pcie(struct serialfc_port *port, int enable)
 void fastcom_set_rs485_fscc(struct serialfc_port *port, int enable)
 {
     unsigned char orig_lcr;
+    __u32 current_fcr, new_fcr;
 
     orig_lcr = ioread8(port->addr + LCR_OFFSET);
+    current_fcr = ioread32(port->card->bar2);
 
     iowrite8(0, port->addr + LCR_OFFSET); /* Ensure last LCR value is not 0xbf */
     iowrite8(ACR_OFFSET, port->addr + SPR_OFFSET); /* To allow access to ACR */
 
-    if (enable)
+    if (enable) {
         port->ACR |= 0x10;
-    else
+        new_fcr = current_fcr | (0x00040000 << port->channel);
+    }
+    else {
         port->ACR &= ~0x10;
+        new_fcr = current_fcr & ~(0x00040000 << port->channel);
+    }
 
     iowrite8(port->ACR, port->addr + ICR_OFFSET); /* Enable 950 trigger to ACR through ICR */
+    iowrite32(new_fcr, port->card->bar2);
 
     iowrite8(orig_lcr, port->addr + LCR_OFFSET);
 }
@@ -462,7 +489,7 @@ int fastcom_set_rs485(struct serialfc_port *port, int enable)
         return -EPROTONOSUPPORT;
     }
 
-	dev_info(port->device, "RS485 = %i\n", enable);
+	dev_dbg(port->device, "RS485 = %i\n", enable);
 
     return 0;
 }
@@ -649,7 +676,7 @@ int fastcom_set_isochronous(struct serialfc_port *port, int mode)
     }
 
     if (status == 0)
-	    dev_info(port->device, "Isochronous mode = %i\n", mode);
+	    dev_dbg(port->device, "Isochronous mode = %i\n", mode);
 
     return status;
 }
@@ -715,7 +742,7 @@ int fastcom_set_termination(struct serialfc_port *port, int enable)
     }
 
     if (status == 0)
-	    dev_info(port->device, "Termination = %i\n", enable);
+	    dev_dbg(port->device, "Termination = %i\n", enable);
 
     return status;
 }
@@ -772,13 +799,12 @@ void fastcom_set_echo_cancel_pcie(struct serialfc_port *port, int enable)
 
 void fastcom_set_echo_cancel_fscc(struct serialfc_port *port, int enable)
 {
-#if 0
-    UINT32 current_fcr, new_fcr;
-	UINT32 bit_mask;
+    __u32 current_fcr, new_fcr;
+	__u32 bit_mask;
 
-    current_fcr = READ_PORT_ULONG(ULongToPtr(pDevExt->Bar2));
+    current_fcr = ioread32(port->card->bar2);
 
-	switch (pDevExt->Channel) {
+	switch (port->channel) {
 	case 0:
 		bit_mask = 0x00010000;
 		break;
@@ -786,6 +812,9 @@ void fastcom_set_echo_cancel_fscc(struct serialfc_port *port, int enable)
 	case 1:
 		bit_mask = 0x00100000;
 		break;
+
+    default:
+		bit_mask = 0x00000000;
 	}
 
 	if (enable)
@@ -793,8 +822,7 @@ void fastcom_set_echo_cancel_fscc(struct serialfc_port *port, int enable)
 	else
 		new_fcr = current_fcr & ~bit_mask;
 
-    WRITE_PORT_ULONG(ULongToPtr(pDevExt->Bar2), new_fcr);
-#endif
+    iowrite32(new_fcr, port->card->bar2);
 }
 
 void fastcom_set_echo_cancel(struct serialfc_port *port, int enable)
@@ -816,7 +844,7 @@ void fastcom_set_echo_cancel(struct serialfc_port *port, int enable)
         break; //TODO
     }
 
-	dev_info(port->device, "Echo cancel = %i\n", enable);
+	dev_dbg(port->device, "Echo cancel = %i\n", enable);
 }
 
 void fastcom_enable_echo_cancel(struct serialfc_port *port)
@@ -849,11 +877,10 @@ void fastcom_get_echo_cancel_pcie(struct serialfc_port *port, int *enabled)
 
 void fastcom_get_echo_cancel_fscc(struct serialfc_port *port, int *enabled)
 {
-#if 0
-    UINT32 fcr;
-	UINT32 bit_mask;
+    __u32 fcr;
+	__u32 bit_mask;
 
-    fcr = READ_PORT_unsigned long(ULongToPtr(port->Bar2));
+    fcr = ioread32(port->card->bar2);
 
 	switch (port->channel) {
 	case 0:
@@ -863,10 +890,12 @@ void fastcom_get_echo_cancel_fscc(struct serialfc_port *port, int *enabled)
 	case 1:
 		bit_mask = 0x00100000;
 		break;
+
+	default:
+		bit_mask = 0x00000000;
 	}
 
 	*enabled = (fcr & bit_mask) ? 1 : 0;
-#endif
 }
 
 void fastcom_get_echo_cancel(struct serialfc_port *port, int *enabled)
@@ -2188,7 +2217,7 @@ int fastcom_set_clock_rate(struct serialfc_port *port, unsigned value)
     }
 
     if (status == 0) {
-	    dev_info(port->device, "Clock rate = %i\n", value);
+	    dev_dbg(port->device, "Clock rate = %i\n", value);
 
         port->clock_rate = value;
     }
@@ -2279,7 +2308,7 @@ int fastcom_set_external_transmit(struct serialfc_port *port, unsigned num_chars
     }
 
     if (status == 0)
-	    dev_info(port->device, "External transmit = %i\n", num_chars);
+	    dev_dbg(port->device, "External transmit = %i\n", num_chars);
 
     return status;
 }
@@ -2347,7 +2376,7 @@ int fastcom_set_frame_length(struct serialfc_port *port, unsigned num_chars)
     }
 
     if (status == 0)
-	    dev_info(port->device, "Frame length = %i\n", num_chars);
+	    dev_dbg(port->device, "Frame length = %i\n", num_chars);
 
     return status;
 }
@@ -2377,7 +2406,7 @@ int fastcom_set_9bit(struct serialfc_port *port, int enable)
     }
 
     if (status == 0)
-	    dev_info(port->device, "9-Bit = %i\n", enable);
+	    dev_dbg(port->device, "9-Bit = %i\n", enable);
 
     return status;
 }

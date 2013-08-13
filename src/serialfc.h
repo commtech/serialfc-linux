@@ -30,6 +30,23 @@
 #define FC_422_4_PCIe_ID 0x0020
 #define FC_422_8_PCIe_ID 0x0021
 
+#define FSCC_ID 0x000f
+#define SFSCC_ID 0x0014
+#define SFSCC_104_LVDS_ID 0x0015
+#define FSCC_232_ID 0x0016
+#define SFSCC_104_UA_ID 0x0017
+#define SFSCC_4_UA_ID 0x0018
+#define SFSCC_UA_ID 0x0019
+#define SFSCC_LVDS_ID 0x001a
+#define FSCC_4_UA_ID 0x001b
+#define SFSCC_4_LVDS_ID 0x001c
+#define FSCC_UA_ID 0x001d
+#define SFSCCe_4_ID 0x001e
+#define SFSCC_4_CPCI_ID 0x001f
+#define SFSCC_4_UA_CPCI_ID 0x0023
+#define SFSCC_4_UA_LVDS_ID 0x0025
+#define SFSCC_UA_LVDS_ID 0x0026
+
 #define DLL_OFFSET 0x0
 #define DLM_OFFSET 0x1
 #define DLD_OFFSET 0x2
