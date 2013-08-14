@@ -257,8 +257,6 @@ struct pci_driver serialfc_pci_driver = {
 static int __init serialfc_init(void)
 {
 	unsigned error_code = 0;
-	unsigned num_devices = 0;
-	struct serialfc_card *new_card = 0;
 
 	serialfc_class = class_create(THIS_MODULE, DEVICE_NAME);
 
@@ -287,6 +285,8 @@ static int __init serialfc_init(void)
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0)
 	if (error_code == 0) {
 		struct pci_dev *pdev = NULL;
+        unsigned num_devices = 0;
+        struct serialfc_card *new_card = 0;
 
 		pdev = pci_get_device(COMMTECH_VENDOR_ID, PCI_ANY_ID, pdev);
 
