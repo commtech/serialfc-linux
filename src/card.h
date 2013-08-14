@@ -22,6 +22,7 @@
 #define CARD_H
 
 #include <linux/list.h>
+#include <linux/fs.h> /* struct file_operations */
 #include <linux/8250_pci.h> /* struct serial_private */
 
 struct serialfc_card {
