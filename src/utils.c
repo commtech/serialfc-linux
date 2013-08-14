@@ -443,7 +443,6 @@ void fastcom_set_rs485_pcie(struct serialfc_port *port, int enable)
     iowrite8(new_fctr, port->addr + UART_EXAR_FCTR);
 }
 
-//TODO: Needs FCR changes
 void fastcom_set_rs485_fscc(struct serialfc_port *port, int enable)
 {
     unsigned char orig_lcr;
@@ -503,10 +502,16 @@ void fastcom_get_rs485_pci(struct serialfc_port *port, int *enabled)
     *enabled = (current_fctr & 0x20) ? 1 : 0;
 }
 
-//TODO: Needs FCR changes
 void fastcom_get_rs485_fscc(struct serialfc_port *port, int *enabled)
 {
-    *enabled = (port->ACR & 0x10) ? 1 : 0;
+    __u32 current_fcr;
+    int dtr_enable_active, transmitter_485_active;
+
+    current_fcr = ioread32(port->card->bar2);
+    dtr_enable_active = (port->ACR & 0x10) ? 1 : 0; /* DTR is active during transmission to turn on drivers */
+    transmitter_485_active = (current_fcr & (0x00040000 << port->channel)) ? 1 : 0;
+
+    *enabled = (dtr_enable_active && transmitter_485_active) ? 1 : 0;
 }
 
 int fastcom_get_rs485(struct serialfc_port *port, int *enabled)
@@ -2395,30 +2400,16 @@ int fastcom_get_frame_length(struct serialfc_port *port, unsigned *num_chars)
     return 0;
 }
 
+//TODO: 9-Bit isn't supported in Linux
 int fastcom_set_9bit(struct serialfc_port *port, int enable)
 {
-    int status;
-
-    switch (fastcom_get_card_type(port)) {
-    default:
-        status = -EPROTONOSUPPORT;
-        break;
-    }
-
-    if (status == 0)
-	    dev_dbg(port->device, "9-Bit = %i\n", enable);
-
-    return status;
+    return -EPROTONOSUPPORT;
 }
 
+//TODO: 9-Bit isn't supported in Linux
 int fastcom_get_9bit(struct serialfc_port *port, int *enabled)
 {
-    switch (fastcom_get_card_type(port)) {
-    //TODO
-
-    default:
-        return -EPROTONOSUPPORT;
-    }
+    return -EPROTONOSUPPORT;
 }
 
 int fastcom_enable_9bit(struct serialfc_port *port)
