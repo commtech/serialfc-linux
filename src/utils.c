@@ -2173,6 +2173,7 @@ int FastcomSetClockRatePCI(struct serialfc_port *port, unsigned rate)
 
 int pcie_set_baud_rate(struct serialfc_port *port, unsigned value)
 {
+#if 0
     const unsigned input_freq = 125000000;
     const unsigned prescaler = 1;
     float divisor = 0;
@@ -2199,7 +2200,7 @@ int pcie_set_baud_rate(struct serialfc_port *port, unsigned value)
     iowrite8(dld, port->addr + DLD_OFFSET);
 
     iowrite8(orig_lcr, port->addr + LCR_OFFSET);
-
+#endif
     return 0;
 }
 
