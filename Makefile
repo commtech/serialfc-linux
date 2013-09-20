@@ -8,11 +8,13 @@ default:
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules
 
 install:
-	cp serialfc.ko /lib/modules/`uname -r`/kernel/drivers/tty/serial/8250/
+	cp serialfc.rules /etc/udev/rules.d/
+	cp serialfc.ko /lib/modules/`uname -r`/kernel/drivers/char/
 	depmod
 
 uninstall:
-	rm /lib/modules/`uname -r`/kernel/drivers/tty/serial/8250/serialfc.ko
+	rm /etc/udev/rules.d/serialfc.rules
+	rm /lib/modules/`uname -r`/kernel/drivers/char/serialfc.ko
 	depmod
 
 clean:
@@ -23,3 +25,11 @@ clean:
 		-type f -print | xargs rm -f
 	rm -rf .tmp_versions
 
+help:
+	@echo
+	@echo 'Build targets:'
+	@echo '  make - Build driver module'
+	@echo '  make clean - Remove most generated files'
+	@echo '  make install - Installs FSCC driver'
+	@echo '  make uninstall - Clean up installation'
+	@echo
