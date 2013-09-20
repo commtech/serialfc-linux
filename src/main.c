@@ -216,6 +216,7 @@ static struct file_operations serialfc_fops = {
 #endif
 };
 
+#if 0
 static int fc_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 {
 	struct serialfc_card *new_card = 0;
@@ -231,6 +232,7 @@ static int fc_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	return 0;
 }
+#endif
 
 static void fc_remove(struct pci_dev *pdev)
 {
@@ -249,7 +251,7 @@ static void fc_remove(struct pci_dev *pdev)
 
 struct pci_driver serialfc_pci_driver = {
 	.name = DEVICE_NAME,
-	.probe = fc_probe,
+	//.probe = fc_probe,
 	.remove = fc_remove,
 	.id_table = fc_id_table,
 };
@@ -282,7 +284,7 @@ static int __init serialfc_init(void)
 		return error_code;
 	}
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0)
+//#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0)
 	if (error_code == 0) {
 		struct pci_dev *pdev = NULL;
         unsigned num_devices = 0;
@@ -314,7 +316,7 @@ static int __init serialfc_init(void)
 			return -ENODEV;
 		}
 	}
-#endif
+//#endif
 	return 0;
 }
 
