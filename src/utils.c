@@ -2171,12 +2171,12 @@ int FastcomSetClockRatePCI(struct serialfc_port *port, unsigned rate)
 }
 #endif
 
+/* Includes non floating point math from David Higgins */
 int pcie_set_baud_rate(struct serialfc_port *port, unsigned value)
 {
-#if 0
     const unsigned input_freq = 125000000;
     const unsigned prescaler = 1;
-    float divisor = 0;
+    unsigned divisor = 0;
     unsigned char orig_lcr = 0;
     unsigned char dlm = 0;
     unsigned char dll = 0;
@@ -2186,21 +2186,22 @@ int pcie_set_baud_rate(struct serialfc_port *port, unsigned value)
 
     iowrite8(orig_lcr | 0x80, port->addr + LCR_OFFSET);
 
-    divisor = (float)input_freq / prescaler / (value * port->sample_rate);
+    divisor = (input_freq * 16) / prescaler / (value * port->sample_rate);
 
-    dlm = (int)divisor >> 8;
-    dll = (int)divisor % 0xff;
+    dlm = divisor >> 12; /* Was shifted by 8 but need to adjust for additional
+                            four bits */
+    dll = (divisor >> 4) & 0xff;
 
     dld = ioread8(port->addr + DLD_OFFSET);
     dld &= 0xf0;
-    dld |= (int)(((divisor - (int)divisor) * port->sample_rate) + 0.5);
+    dld |= (divisor & 0xf);
 
     iowrite8(dlm, port->addr + DLM_OFFSET);
     iowrite8(dll, port->addr + DLL_OFFSET);
     iowrite8(dld, port->addr + DLD_OFFSET);
 
     iowrite8(orig_lcr, port->addr + LCR_OFFSET);
-#endif
+
     return 0;
 }
 
