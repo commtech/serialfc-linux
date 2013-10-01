@@ -4,6 +4,10 @@ PWD	:= $(shell pwd)
 IGNORE	:=
 serialfc-objs := src/main.o src/card.o src/port.o src/utils.o
 
+ifeq ($(DEBUG),1)
+	EXTRA_CFLAGS += -DDEBUG
+endif
+
 default:
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules
 
