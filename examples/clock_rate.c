@@ -5,7 +5,6 @@
 int main(void)
 {
     int fd = 0;
-    unsigned status = 0;
 
     fd = open("/dev/serialfc0", O_RDWR);
 

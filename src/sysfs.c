@@ -325,6 +325,23 @@ static ssize_t tx_trigger_show(struct kobject *kobj,
 	return sprintf(buf, "%i\n", value);
 }
 
+static ssize_t clock_rate_store(struct kobject *kobj,
+							struct kobj_attribute *attr, const char *buf,
+							size_t count)
+{
+	struct serialfc_port *port = 0;
+	unsigned value = 0;
+	char *end = 0;
+
+	port = (struct serialfc_port *)dev_get_drvdata((struct device *)kobj);
+
+	value = (unsigned)simple_strtoul(buf, &end, 16);
+
+	fastcom_set_clock_rate(port, value);
+
+	return count;
+}
+
 static struct kobj_attribute nine_bit_attribute =
 	__ATTR(nine_bit, SYSFS_READ_WRITE_MODE, nine_bit_show, nine_bit_store);
 
@@ -355,6 +372,9 @@ static struct kobj_attribute termination_attribute =
 static struct kobj_attribute tx_trigger_attribute =
 	__ATTR(tx_trigger, SYSFS_READ_WRITE_MODE, tx_trigger_show, tx_trigger_store);
 
+static struct kobj_attribute clock_rate_attribute =
+	__ATTR(clock_rate, SYSFS_READ_MODE, NULL, clock_rate_store);
+
 static struct attribute *settings_attrs[] = {
 	&nine_bit_attribute.attr,
 	&echo_cancel_attribute.attr,
@@ -366,6 +386,7 @@ static struct attribute *settings_attrs[] = {
 	&sample_rate_attribute.attr,
 	&termination_attribute.attr,
 	&tx_trigger_attribute.attr,
+	&clock_rate_attribute.attr,
 	NULL,
 };
 
