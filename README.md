@@ -131,7 +131,7 @@ There is documentation for each specific function listed below, but lets get sta
 with a quick programming example for fun.
 
 _This tutorial has already been set up for you at_ 
-[`serialfc/examples/tutorial.c`](https://github.com/commtech/serialfc-linux/tree/master/examples/serialfc.c).
+[`serialfc/examples/tutorial.c`](https://github.com/commtech/serialfc-linux/tree/master/examples/tutorial.c).
 
 Create a new C file (named tutorial.c) with the following code.
 
