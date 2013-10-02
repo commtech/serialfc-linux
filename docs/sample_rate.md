@@ -36,7 +36,7 @@ cat /sys/class/serialfc/serialfc0/settings/sample_rate
 ## Set
 ### IOCTL
 ```c
-IOCTL_FASTCOM_ENABLE_SAMPLE_RATE
+IOCTL_FASTCOM_SET_SAMPLE_RATE
 ```
 
 ###### Examples

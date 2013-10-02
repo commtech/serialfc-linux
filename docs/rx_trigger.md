@@ -36,7 +36,7 @@ cat /sys/class/serialfc/serialfc0/settings/rx_trigger
 ## Set
 ### IOCTL
 ```c
-IOCTL_FASTCOM_ENABLE_RX_TRIGGER
+IOCTL_FASTCOM_SET_RX_TRIGGER
 ```
 
 ###### Examples
