@@ -15,12 +15,14 @@ install:
 	cp serialfc.rules /etc/udev/rules.d/
 	cp serialfc.ko /lib/modules/`uname -r`/kernel/drivers/char/
 	echo 'serialfc' >> /etc/modules
+	cp lib/raw/serialfc.h /usr/local/include/
 	depmod
 
 uninstall:
 	rm /etc/udev/rules.d/serialfc.rules
 	rm /lib/modules/`uname -r`/kernel/drivers/char/serialfc.ko
 	sed --in-place '/serialfc/d' /etc/modules
+	rm /usr/local/include/serialfc.h
 	depmod
 
 clean:
