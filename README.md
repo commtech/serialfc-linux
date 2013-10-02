@@ -4,7 +4,7 @@ This README file is best viewed [online](http://github.com/commtech/serialfc-lin
 ## Installing Driver
 
 ##### Downloading Driver Source Code
-The source code for the FSCC driver is hosted on Github code hosting. To check
+The source code for the SerialFC driver is hosted on Github code hosting. To check
 out the latest code you will need Git and to run the following in a terminal.
 
 ```
