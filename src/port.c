@@ -6,6 +6,7 @@
 #include "serialfc.h"
 #include "config.h"
 #include "utils.h"
+#include "sysfs.h"
 
 struct serialfc_port *serialfc_port_new(struct serialfc_card *card, unsigned channel,
 							unsigned major_number, unsigned minor_number,
@@ -66,6 +67,16 @@ struct serialfc_port *serialfc_port_new(struct serialfc_card *card, unsigned cha
 		printk(KERN_ERR DEVICE_NAME " %s: device_create failed\n", port->name);
 		return 0;
 	}
+
+	/* The sysfs structures I use in sysfs.c don't work prior to 2.6.25 */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 25)
+
+	if (sysfs_create_group(&port->device->kobj, &port_settings_attr_group)) {
+		dev_err(port->device, "sysfs_create_group\n");
+		return 0;
+	}
+
+#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 25) */
 
 	port->channel = channel;
 	port->card = card;

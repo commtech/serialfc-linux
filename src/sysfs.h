@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2013  Commtech, Inc.
+	Copyright (C) 2013 Commtech, Inc.
 
 	This file is part of serialfc-linux.
 
@@ -14,19 +14,14 @@
 	GNU General Public License for more details.
 
 	You should have received a copy of the GNU General Public License
-	along with serialfc-linux.  If not, see <http://www.gnu.org/licenses/>.
+	along with serialfc-linux.	If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#define DEVICE_NAME "serialfc"
+#ifndef SERIALFC_SYSFS
+#define SERIALFC_SYSFS
 
-#define DEFAULT_RS485 0
-#define DEFAULT_SAMPLE_RATE 16
-#define DEFAULT_TX_TRIGGER_LEVEL 32
-#define DEFAULT_RX_TRIGGER_LEVEL 32
-#define DEFAULT_TERMINATION 1
-#define DEFAULT_ECHO_CANCEL 0
-#define DEFAULT_ISOCHRONOUS -1
-#define DEFAULT_FRAME_LENGTH 1
+extern struct attribute_group port_settings_attr_group;
 
-#define SYSFS_READ_WRITE_MODE S_IWUGO | S_IRUGO
+#endif
+
