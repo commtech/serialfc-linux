@@ -1,6 +1,6 @@
 #The GROUP assignment allows you to define which Unix group should own
 #the device node. Here is an example rule which defines that the users
-#group will own the fscc devices:
+#group will own the serialfc devices:
 #
 #SUBSYSTEM=="serialfc*", GROUP="users"
 #
@@ -19,7 +19,7 @@
 #
 #SUBSYSTEM=="serialfc*", MODE="0666"
 #
-#Ensures that the device node named serialfc0 is created at /dev/serialfc/0 but 
+#Ensures that the device node named serialfc0 is created at /dev/serialfc/0 but
 #also creates a symbolic link at /dev/serialfc0 as usual.
 #
 #SUBSYSTEM=="serialfc*", SYMLINK+="%k"
