@@ -797,7 +797,7 @@ void fastcom_set_echo_cancel_pcie(struct serialfc_port *port, int enable)
     if (enable)
         new_mpio_lvlh = current_mpio_lvlh | (0x1 << port->channel); /* Enable echo cancel */
     else
-        new_mpio_lvlh = current_mpio_lvlh & (0x1 << port->channel); /* Disable echo cancel */
+        new_mpio_lvlh = current_mpio_lvlh & ~(0x1 << port->channel); /* Disable echo cancel */
 
     iowrite8(new_mpio_lvlh, port->addr + MPIOLVLH_OFFSET);
 }
