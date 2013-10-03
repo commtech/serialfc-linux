@@ -710,16 +710,16 @@ int fastcom_disable_isochronous(struct serialfc_port *port)
 
 void fastcom_set_termination_pcie(struct serialfc_port *port, int enable)
 {
-    unsigned char current_mpio_lvlh, new_mpio_lvlh;
+    unsigned char current_mpio_lvl, new_mpio_lvl;
 
-    current_mpio_lvlh = ioread8(port->addr + MPIOLVLH_OFFSET);
+    current_mpio_lvl = ioread8(port->addr + MPIOLVL_OFFSET);
 
     if (enable)
-        new_mpio_lvlh = current_mpio_lvlh | (0x1 << port->channel); /* Enable termination */
+        new_mpio_lvl = current_mpio_lvl | (0x1 << port->channel); /* Enable termination */
     else
-        new_mpio_lvlh = current_mpio_lvlh & (0x1 << port->channel); /* Disable termination */
+        new_mpio_lvl = current_mpio_lvl & ~(0x1 << port->channel); /* Disable termination */
 
-    iowrite8(new_mpio_lvlh, port->addr + MPIOLVLH_OFFSET);
+    iowrite8(new_mpio_lvl, port->addr + MPIOLVL_OFFSET);
 }
 
 void fastcom_get_termination_pcie(struct serialfc_port *port, int *enabled)
@@ -790,16 +790,16 @@ void fastcom_set_echo_cancel_pci(struct serialfc_port *port, int enable)
 
 void fastcom_set_echo_cancel_pcie(struct serialfc_port *port, int enable)
 {
-    unsigned char current_mpio_lvl, new_mpio_lvl;
+    unsigned char current_mpio_lvlh, new_mpio_lvlh;
 
-    current_mpio_lvl = ioread8(port->addr + MPIOLVL_OFFSET);
+    current_mpio_lvlh = ioread8(port->addr + MPIOLVLH_OFFSET);
 
     if (enable)
-        new_mpio_lvl = current_mpio_lvl | (0x1 << port->channel); /* Enable echo cancel */
+        new_mpio_lvlh = current_mpio_lvlh | (0x1 << port->channel); /* Enable echo cancel */
     else
-        new_mpio_lvl = current_mpio_lvl & ~(0x1 << port->channel); /* Disable echo cancel */
+        new_mpio_lvlh = current_mpio_lvlh & (0x1 << port->channel); /* Disable echo cancel */
 
-    iowrite8(new_mpio_lvl, port->addr + MPIOLVL_OFFSET);
+    iowrite8(new_mpio_lvlh, port->addr + MPIOLVLH_OFFSET);
 }
 
 void fastcom_set_echo_cancel_fscc(struct serialfc_port *port, int enable)
