@@ -2,6 +2,9 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/ioctl.h>
+
+//#define ASYNC_PCIE
 
 int main(void)
 {
@@ -16,6 +19,16 @@ int main(void)
         perror("open");
         return EXIT_FAILURE;
     }
+
+#ifdef ASYNC_PCIE
+    {
+        int status = 0;
+
+        ioctl(fd, TIOCMGET, &status);
+        status &= ~TIOCM_DTR; /* force DTR active = RS422 */
+        ioctl(fd, TIOCMSET, &status);
+    }
+#endif
 
     /* Send "Hello world!" text */
     write(fd, odata, sizeof(odata));
