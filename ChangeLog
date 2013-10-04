@@ -1,6 +1,7 @@
 version 2.1.0 (10/04/2013)
 --------------------------------------------------------------------------------
-    * Fixed echo cancel and termination being set incorrectly
+    * Fixed echo cancel and termination being set incorrectly on 422/X-PCIe
+      cards
     * Added sysfs support
     * Fixed an issue where FSCC card conflicts could happen with the FSCC
       driver
