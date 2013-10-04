@@ -715,9 +715,9 @@ void fastcom_set_termination_pcie(struct serialfc_port *port, int enable)
     current_mpio_lvl = ioread8(port->addr + MPIOLVL_OFFSET);
 
     if (enable)
-        new_mpio_lvl = current_mpio_lvl | (0x1 << port->channel); /* Enable termination */
+        new_mpio_lvl = current_mpio_lvl & ~(0x1 << port->channel); /* Enable termination */
     else
-        new_mpio_lvl = current_mpio_lvl & ~(0x1 << port->channel); /* Disable termination */
+        new_mpio_lvl = current_mpio_lvl | (0x1 << port->channel); /* Disable termination */
 
     iowrite8(new_mpio_lvl, port->addr + MPIOLVL_OFFSET);
 }
