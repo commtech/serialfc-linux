@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <sys/ioctl.h>
 
-//#define ASYNC_PCIE
+/* #define ASYNC_PCIE */
 
 int main(void)
 {
@@ -25,7 +25,7 @@ int main(void)
         int status = 0;
 
         ioctl(fd, TIOCMGET, &status);
-        status &= ~TIOCM_DTR; /* force DTR active = RS422 */
+        status &= ~TIOCM_DTR; /* Required for loop back */
         ioctl(fd, TIOCMSET, &status);
     }
 #endif
