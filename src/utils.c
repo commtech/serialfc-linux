@@ -398,26 +398,21 @@ int fastcom_get_rx_trigger(struct serialfc_port *port, unsigned *value)
 
 void fastcom_set_rs485_pci(struct serialfc_port *port, int enable)
 {
-    unsigned char current_mcr, new_mcr;
     unsigned char current_fctr, new_fctr;
     unsigned char current_mpio_lvl, new_mpio_lvl;
 
-    current_mcr = ioread8(port->addr + MCR_OFFSET);
     current_fctr = ioread8(port->addr + UART_EXAR_FCTR);
     current_mpio_lvl = ioread8(port->addr + MPIOLVL_OFFSET);
 
     if (enable) {
-        new_mcr = current_mcr | 0x3;  /* Force RTS/DTS to low (not sure why yet) */
         new_fctr = current_fctr | 0x20; /* Enable Auto 485 on UART */
         new_mpio_lvl = current_mpio_lvl & ~(0x8 << port->channel); /* Enable 485 on transmitters */
     }
     else {
-        new_mcr = current_mcr & ~0x3;  /* Force RTS/DTS to high (not sure why yet) */
         new_fctr = current_fctr & ~0x20; /* Disable Auto 485 on UART */
         new_mpio_lvl = current_mpio_lvl | (0x8 << port->channel); /* Disable 485 on transmitters */
     }
 
-    iowrite8(new_mcr, port->addr + MCR_OFFSET);
     iowrite8(new_mpio_lvl, port->addr + MPIOLVL_OFFSET);
     iowrite8(new_fctr, port->addr + UART_EXAR_FCTR);
 }
