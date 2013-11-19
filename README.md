@@ -221,6 +221,35 @@ own program. All of these options are described on their respective documentatio
 - [Disconnect](https://github.com/commtech/serialfc-linux/blob/master/docs/disconnect.md)
 
 
+### 422/X-PCIe Differences
+The 422/X-PCIe family of cards use DTR to manage RS485. This causes complications when using the Linux 
+serial driver. There are a couple extra steps needed in your software to use the card correctly.
+
+##### 422 Mode
+```
+int mode = 0;
+
+ioctl(fd, TIOCMGET, &mode);
+mode &= ~TIOCM_DTR; /* Set DTR to 1 (transmitter always on, 422) */
+ioctl(fd, TIOCMSET, &mode);
+
+// Other 422 initialization code
+
+```
+        
+##### 485 Mode
+```
+int mode = 0;
+
+ioctl(ttys_fd, TIOCMGET, &mode);
+mode |= 0x2000; /* Use DTR signal for turning on transmitter */
+ioctl(ttys_fd, TIOCMSET, &mode);
+
+// Other 485 initialization code
+
+```
+
+
 ### FAQ
 
 ##### Why does my system not have enough /dev/ttyS nodes?
