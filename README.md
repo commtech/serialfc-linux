@@ -163,7 +163,7 @@ int main(void)
         int status = 0;
 
         ioctl(fd, TIOCMGET, &status);
-        status &= ~TIOCM_DTR; /* Required for loop back */
+        status &= ~TIOCM_DTR; /* Set DTR to 1 (transmitter always on, 422) */
         ioctl(fd, TIOCMSET, &status);
     }
 #endif
