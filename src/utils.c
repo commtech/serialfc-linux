@@ -2420,3 +2420,73 @@ int fastcom_disable_9bit(struct serialfc_port *port)
 {
     return fastcom_set_9bit(port, 0);
 }
+
+void fastcom_init_gpio(struct serialfc_port *port)
+{
+    switch (fastcom_get_card_type(port)) {
+    case CARD_TYPE_PCI:
+        switch (port->card->pci_dev->device) {
+        case FC_422_2_PCI_335_ID:
+        case FC_422_4_PCI_335_ID:
+            /* Switch GPIO pins to outputs */
+            iowrite8(0x00, port->addr + MPIOSEL_OFFSET);
+            break;
+
+        case FC_232_4_PCI_335_ID:
+        case FC_232_8_PCI_335_ID:
+            iowrite8(0xc0, port->addr + MPIOSEL_OFFSET);
+            iowrite8(0xc0, port->addr + MPIOINV_OFFSET);
+            break;
+        }
+        break;
+
+    case CARD_TYPE_PCIe:
+         /* Switch GPIO pins to outputs */
+        iowrite8(0x00, port->addr + MPIOSEL_OFFSET);
+        iowrite8(0x00, port->addr + MPIOSELH_OFFSET);
+        break;
+
+    case CARD_TYPE_FSCC:
+        break;
+
+    default:
+        break;
+    }
+}
+
+void fastcom_init_triggers(struct serialfc_port *port)
+{
+    /* Enable programmable trigger levels */
+    switch (fastcom_get_card_type(port)) {
+    case CARD_TYPE_PCI:
+    case CARD_TYPE_PCIe: {
+            unsigned char current_fctr, new_fctr;
+
+            current_fctr = ioread8(port->addr + UART_EXAR_FCTR);
+
+            new_fctr = current_fctr | 0xc0; /* Enable programmable triggers */
+
+            iowrite8(0x01, port->addr + FCR_OFFSET); /* Enable TX & RX FIFO's */
+            iowrite8(new_fctr, port->addr + UART_EXAR_FCTR);
+        }
+        break;
+
+    case CARD_TYPE_FSCC:
+        iowrite8(0x00, port->addr + LCR_OFFSET);
+        iowrite8(0x01, port->addr + FCR_OFFSET); /* Enable FIFO (combined with enhanced enables 950 mode) */
+
+        iowrite8(0xbf, port->addr + LCR_OFFSET); /* Set to 0xbf to access 650 registers */
+        iowrite8(0x10, port->addr + EFR_OFFSET); /* Enable enhanced mode */
+
+        iowrite8(0x00, port->addr + LCR_OFFSET); /* Ensure last LCR value is not 0xbf */
+        iowrite8(ACR_OFFSET, port->addr + SPR_OFFSET); /* To allow access to ACR */
+        port->ACR = 0x20;
+        iowrite8(port->ACR, port->addr + ICR_OFFSET); /* Enable 950 trigger to ACR through ICR */
+
+        iowrite8(0x00, port->addr + LCR_OFFSET);
+        break;
+
+    default:
+        break;
+    }
+}

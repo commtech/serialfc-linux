@@ -15,7 +15,6 @@ struct serialfc_port *serialfc_port_new(struct serialfc_card *card, unsigned cha
 {
 	struct serialfc_port *port = 0;
 	unsigned default_clock_rate = 1843200;
-	unsigned i = 0;
 
 	port = kmalloc(sizeof(*port), GFP_KERNEL);
 
@@ -96,52 +95,8 @@ struct serialfc_port *serialfc_port_new(struct serialfc_card *card, unsigned cha
         default_clock_rate = 1843200;
     }
 
-    switch (port->card->pci_dev->device) {
-    case FC_422_2_PCI_335_ID:
-    case FC_422_4_PCI_335_ID:
-        iowrite8(0x00, port->addr + MPIOSEL_OFFSET);
-        iowrite8(0x00, port->addr + MPIOINV_OFFSET);
-        iowrite8(0x00, port->addr + MPIOOD_OFFSET);
-        iowrite8(0x00, port->addr + MPIO3T_OFFSET);
-        iowrite8(0x00, port->addr + MPIOINT_OFFSET);
-        break;
-
-    case FC_232_4_PCI_335_ID:
-    case FC_232_8_PCI_335_ID:
-        iowrite8(0xc0, port->addr + MPIOSEL_OFFSET);
-        iowrite8(0xc0, port->addr + MPIOINV_OFFSET);
-        iowrite8(0x00, port->addr + MPIOOD_OFFSET);
-        iowrite8(0x00, port->addr + MPIO3T_OFFSET);
-        iowrite8(0x00, port->addr + MPIOINT_OFFSET);
-        break;
-
-    case FC_422_4_PCIe_ID:
-    case FC_422_8_PCIe_ID:
-        for (i = MPIOINT_OFFSET; i <= MPIOODH_OFFSET; i++)
-            iowrite8(0x00, port->addr + i);
-        break;
-    }
-
-    if (port->card->pci_dev->device >= 0x14 && port->card->pci_dev->device <= 0x1F) {
-        unsigned char init_lcr;
-        unsigned char init_fcr;
-
-        init_lcr = 0x00;
-        init_fcr = 0x01; /* Enable FIFO (combined with enhanced enables 950 mode) */
-
-        iowrite8(init_lcr, port->addr + LCR_OFFSET);
-        iowrite8(init_fcr, port->addr + FCR_OFFSET);
-
-        iowrite8(0xbf, port->addr + LCR_OFFSET); /* Set to 0xbf to access 650 registers */
-        iowrite8(0x10, port->addr + EFR_OFFSET); /* Enable enhanced mode */
-
-        iowrite8(0, port->addr + LCR_OFFSET); /* Ensure last LCR value is not 0xbf */
-        iowrite8(ACR_OFFSET, port->addr + SPR_OFFSET); /* To allow access to ACR */
-        port->ACR = 0x20;
-        iowrite8(port->ACR, port->addr + ICR_OFFSET); /* Enable 950 trigger to ACR through ICR */
-
-        iowrite8(init_lcr, port->addr + LCR_OFFSET);
-    }
+    fastcom_init_gpio(port);
+    fastcom_init_triggers(port);
 
     fastcom_set_clock_rate(port, default_clock_rate);
     fastcom_set_rs485(port, DEFAULT_RS485);

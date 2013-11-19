@@ -92,4 +92,7 @@ int pcie_set_baud_rate(struct serialfc_port *port, unsigned value);
 enum FASTCOM_CARD_TYPE fastcom_get_card_type2(struct serialfc_card *card);
 enum FASTCOM_CARD_TYPE fastcom_get_card_type(struct serialfc_port *port);
 
+void fastcom_init_gpio(struct serialfc_port *port);
+void fastcom_init_triggers(struct serialfc_port *port);
+
 #endif
