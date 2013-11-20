@@ -2446,9 +2446,6 @@ void fastcom_init_gpio(struct serialfc_port *port)
         iowrite8(0x00, port->addr + MPIOSELH_OFFSET);
         break;
 
-    case CARD_TYPE_FSCC:
-        break;
-
     default:
         break;
     }
