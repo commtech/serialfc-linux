@@ -292,6 +292,11 @@ of 16 MHz and a sampling rate of 16.
 
 ### FAQ
 
+##### Why am I not receiving all of my data while in RS485 mode?
+Manually closing the port immediately after an RS485 transfer could cause the serial
+driver to disable the transmitter. Either don't close the port (which will give it time
+to clean itself up), run other code, or manually put in a sleep before closing
+
 ##### Why does my system not have enough /dev/ttyS nodes?
 Some Linux distributions have the default number of serial ports that are
 available at boot set to a small number (usually 4). The first four serial
