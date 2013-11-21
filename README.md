@@ -250,6 +250,39 @@ ioctl(ttys_fd, TIOCMSET, &mode);
 ```
 
 
+### Custom Baud Rates
+Using custom baud rates in Linux require a few modifications. 
+```
+/* Set the speed to 38400 so that we can use the custom speed below */
+tcgetattr(ttys_fd, &tios);
+
+cfsetospeed(&tios, B38400);
+cfsetispeed(&tios, B38400);
+
+tcsetattr(ttys_fd, TCSANOW, &tios);
+
+
+/* Set up our new baud base (clock frequency / sampling rate) and enable
+ custom speed flag */
+ioctl(ttys_fd, TIOCGSERIAL, &ss);
+
+ss.baud_base = CUSTOM_BAUD; /* Requires admin rights */
+ss.flags = (ss.flags & ~ASYNC_SPD_MASK) | ASYNC_SPD_CUST;
+ss.custom_divisor = (ss.baud_base + (CUSTOM_BAUD / 2)) / CUSTOM_BAUD;
+
+if (ioctl(ttys_fd, TIOCSSERIAL, &ss) < 0) {
+    perror("TIOCSSERIAL");
+}
+```
+
+This can also be achieved using the `setserial` utlity.
+```
+# setserial /dev/ttyS# Baud_base 1000000   // Clock frequency divided by sampling rate (16)   
+# setserial /dev/ttyS# spd_cust            // Turn the spd_cust flag ON
+# setserial /dev/ttyS# divisor 1           // spd_cust will use a divisor of 1
+```
+
+
 ### FAQ
 
 ##### Why does my system not have enough /dev/ttyS nodes?
