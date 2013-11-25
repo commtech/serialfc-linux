@@ -317,6 +317,12 @@ it to allow for more serial ports. This is not preferred because you will
 need to recompile the kernel for it to take effect. The line you need to
 change in the .config file is SERIAL_8250_RUNTIME_UARTS.
 
+##### The `open` call is hanging. What am I doing wrong?
+There are a couple possibilities. If you are using an FSCC card, make sure 
+you can have asynchronous mode enabled in the FCR register. Also, some
+of the older FSCC firmware versions require you to open the port in O_NONBLOCK
+mode.
+
 ##### How do I give my user account permissions to touch the serial ports?
 ```
 adduser <username> dialout
