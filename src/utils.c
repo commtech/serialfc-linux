@@ -542,7 +542,7 @@ int fastcom_set_isochronous_fscc(struct serialfc_port *port, int mode)
     unsigned char new_cks = 0;
     unsigned char new_mdm = 0;
 
-    if (mode > 8 || mode < -1)
+    if (mode > 10 || mode < -1)
         return -EINVAL;
 
     orig_lcr = ioread8(port->addr + LCR_OFFSET);
@@ -554,6 +554,7 @@ int fastcom_set_isochronous_fscc(struct serialfc_port *port, int mode)
     case 2:
     case 3:
     case 4:
+    case 10:
         new_cks |= 0x09;
         new_mdm |= 0x02;
         break;
@@ -586,6 +587,11 @@ int fastcom_set_isochronous_fscc(struct serialfc_port *port, int mode)
     case 4:
     case 7:
         new_cks |= 0x90;
+        break;
+
+    case 9:
+    case 10:
+        new_cks |= 0x10;
         break;
     }
 
@@ -653,6 +659,16 @@ void fastcom_get_isochronous_fscc(struct serialfc_port *port, int *mode)
 
     case 0xDB:
         *mode = 8;
+        break;
+        break;
+
+    case 0x10:
+        *mode = 9;
+        break;
+        break;
+
+    case 0x19:
+        *mode = 10;
         break;
     }
 
