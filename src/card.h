@@ -33,6 +33,7 @@ struct serialfc_card {
 	void __iomem *addr;
 
 	/* fscc only */
+	void __iomem *bar0;
 	void __iomem *bar2;
 };
 

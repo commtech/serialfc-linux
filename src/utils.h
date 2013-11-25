@@ -95,4 +95,6 @@ enum FASTCOM_CARD_TYPE fastcom_get_card_type(struct serialfc_port *port);
 void fastcom_init_gpio(struct serialfc_port *port);
 void fastcom_init_triggers(struct serialfc_port *port);
 
+unsigned char fscc_get_frev(struct serialfc_port *port);
+
 #endif

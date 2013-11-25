@@ -2346,9 +2346,15 @@ int fastcom_disable_external_transmit(struct serialfc_port *port)
 int fastcom_set_frame_length_fscc(struct serialfc_port *port, unsigned num_chars)
 {
     unsigned char orig_lcr;
+    unsigned char frev;
 
     if (num_chars == 0 || num_chars > 256)
         return -EINVAL;
+
+    frev = fscc_get_frev(port);
+
+    if (frev < 0x20)
+        return -EPROTONOSUPPORT;
 
     orig_lcr = ioread8(port->addr + LCR_OFFSET);
     iowrite8(0, port->addr + LCR_OFFSET); /* Ensure last LCR value is not 0xbf */
@@ -2361,10 +2367,16 @@ int fastcom_set_frame_length_fscc(struct serialfc_port *port, unsigned num_chars
     return 0;
 }
 
-void fastcom_get_frame_length_fscc(struct serialfc_port *port, unsigned *num_chars)
+int fastcom_get_frame_length_fscc(struct serialfc_port *port, unsigned *num_chars)
 {
     unsigned char orig_lcr;
     unsigned char flr;
+    unsigned char frev;
+
+    frev = fscc_get_frev(port);
+
+    if (frev < 0x20)
+        return -EPROTONOSUPPORT;
 
     orig_lcr = ioread8(port->addr + LCR_OFFSET);
 
@@ -2380,6 +2392,8 @@ void fastcom_get_frame_length_fscc(struct serialfc_port *port, unsigned *num_cha
     iowrite8(ACR_OFFSET, port->addr + SPR_OFFSET); /* To allow access to ACR */
     iowrite8(port->ACR, port->addr + ICR_OFFSET); /* Restore original ACR value */
     iowrite8(orig_lcr, port->addr + LCR_OFFSET);
+
+    return 0;
 }
 
 int fastcom_set_frame_length(struct serialfc_port *port, unsigned num_chars)
@@ -2403,16 +2417,18 @@ int fastcom_set_frame_length(struct serialfc_port *port, unsigned num_chars)
 
 int fastcom_get_frame_length(struct serialfc_port *port, unsigned *num_chars)
 {
+    int status;
+
     switch (fastcom_get_card_type(port)) {
     case CARD_TYPE_FSCC:
-        fastcom_get_frame_length_fscc(port, num_chars);
+        status = fastcom_get_frame_length_fscc(port, num_chars);
         break;
 
     default:
         return -EPROTONOSUPPORT;
     }
 
-    return 0;
+    return status;
 }
 
 //TODO: 9-Bit isn't supported in Linux
@@ -2502,4 +2518,9 @@ void fastcom_init_triggers(struct serialfc_port *port)
     default:
         break;
     }
+}
+
+unsigned char fscc_get_frev(struct serialfc_port *port)
+{
+    return ioread32(port->card->bar0 + VSTR_OFFSET + (port->channel * 0x80)) & 0x000000ff;
 }

@@ -155,6 +155,13 @@ struct serialfc_card *serialfc_card_new(struct pci_dev *pdev,
 	}
 
 	if (fastcom_get_card_type2(card) == CARD_TYPE_FSCC) {
+	    card->bar0 = pci_iomap(card->pci_dev, 0, 0);
+
+	    if (card->bar0 == NULL) {
+		    dev_err(&card->pci_dev->dev, "pci_iomap failed\n");
+		    return 0;
+	    }
+
 	    card->bar2 = pci_iomap(card->pci_dev, 2, 0);
 
 	    if (card->bar2 == NULL) {
