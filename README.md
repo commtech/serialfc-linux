@@ -250,7 +250,52 @@ ioctl(ttys_fd, TIOCMSET, &mode);
 ```
 
 
+### Custom Baud Rates
+Using custom baud rates in Linux require a few modifications. 
+```
+#include <termios.h>
+#include <sys/ioctl.h>
+#include <linux/serial.h>
+...
+
+/* Set the speed to 38400 so that we can use the custom speed below */
+tcgetattr(ttys_fd, &tios);
+
+cfsetospeed(&tios, B38400);
+cfsetispeed(&tios, B38400);
+
+tcsetattr(ttys_fd, TCSANOW, &tios);
+
+
+/* Set up our new baud base (clock frequency / sampling rate) and enable
+ custom speed flag */
+ioctl(ttys_fd, TIOCGSERIAL, &ss);
+
+ss.baud_base = CUSTOM_BAUD; /* Requires admin rights */
+ss.flags = (ss.flags & ~ASYNC_SPD_MASK) | ASYNC_SPD_CUST;
+ss.custom_divisor = (ss.baud_base + (CUSTOM_BAUD / 2)) / CUSTOM_BAUD;
+
+ioctl(ttys_fd, TIOCSSERIAL, &ss);
+```
+
+This can also be achieved using the `setserial` utlity and the `baud_base`,
+`spd_cust` and `divisor` parameters.
+
+Here is an example of setting a baud rate of 1 MHz assuming a clock frequency
+of 16 MHz and a sampling rate of 16.
+```
+# setserial /dev/ttyS# baud_base 1000000   // clock frequency / sampling rate 
+# setserial /dev/ttyS# spd_cust            // turn the spd_cust flag ON
+# setserial /dev/ttyS# divisor 1           // spd_cust will use a divisor of 1
+```
+
+
 ### FAQ
+
+##### Why am I not receiving all of my data while in RS485 mode?
+Manually closing the port immediately after an RS485 transfer could cause the serial
+driver to disable the transmitter. Either don't close the port (which will give it time
+to clean itself up), run other code, or manually put in a sleep before closing
 
 ##### Why does my system not have enough /dev/ttyS nodes?
 Some Linux distributions have the default number of serial ports that are
