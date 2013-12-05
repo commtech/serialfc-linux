@@ -330,7 +330,7 @@ mode.
 
 ##### How do I give my user account permissions to touch the serial ports?
 ```
-adduser <username> dialout
+usermod -a -G dialout <username>
 ```
 
 ##### How do I prevent `setserial` from caching old serial port settings?
