@@ -97,4 +97,7 @@ void fastcom_init_triggers(struct serialfc_port *port);
 
 unsigned char fscc_get_frev(struct serialfc_port *port);
 
+int fscc_enable_async_mode(struct serialfc_port *port);
+int fscc_disable_async_mode(struct serialfc_port *port);
+
 #endif

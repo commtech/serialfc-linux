@@ -32,6 +32,8 @@
 static int serialfc_major_number;
 static struct class *serialfc_class = 0;
 
+unsigned fscc_enable_async = DEFAULT_FSCC_ASYNC_MODE;
+
 struct serialfc_card *serialfc_card_find(struct pci_dev *pdev,
                                          struct list_head *card_list);
 
@@ -360,6 +362,11 @@ MODULE_AUTHOR("William Fagan <willf@commtech-fastcom.com>");
 
 MODULE_DESCRIPTION("Registers the UARTs on the async series of Commtech cards "\
                    "with the serial driver.");
+
+module_param(fscc_enable_async, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+MODULE_PARM_DESC(fscc_enable_async, 
+    "Enable asynchronous mode on FSCC cards when loaded (removes fscc-linux " \
+    "requirement).");
 
 module_init(serialfc_init);
 module_exit(serialfc_exit);

@@ -2524,3 +2524,39 @@ unsigned char fscc_get_frev(struct serialfc_port *port)
 {
     return ioread32(port->card->bar0 + VSTR_OFFSET + (port->channel * 0x80)) & 0x000000ff;
 }
+
+int fscc_enable_async_mode(struct serialfc_port *port)
+{
+    __u32 orig_fcr, new_fcr;
+
+    if (fastcom_get_card_type(port) != CARD_TYPE_FSCC)
+        return -EPROTONOSUPPORT;
+
+    orig_fcr = ioread32(port->card->bar2);
+
+    if ((orig_fcr & (0x01000000 << port->channel)) == 0) {
+        /* UART_{A,B} */
+        new_fcr = orig_fcr | (0x01000000 << port->channel);
+
+        iowrite32(new_fcr, port->card->bar2);
+    }
+
+    return 0;
+}
+
+int fscc_disable_async_mode(struct serialfc_port *port)
+{
+    __u32 orig_fcr, new_fcr;
+
+    if (fastcom_get_card_type(port) != CARD_TYPE_FSCC)
+        return -EPROTONOSUPPORT;
+
+    orig_fcr = ioread32(port->card->bar2);
+
+    /* UART_{A,B} */
+    new_fcr = orig_fcr & ~(0x01000000 << port->channel);
+
+    iowrite32(new_fcr, port->card->bar2);
+
+    return 0;
+}
