@@ -13,7 +13,7 @@ int main(void)
     int mode = 0;
 #endif
 
-    ttys_fd = open("/dev/ttyS4", O_RDWR);
+    ttys_fd = open("/dev/ttyS4", O_RDWR | O_NDELAY);
     serialfc_fd = open("/dev/serialfc0", O_RDWR);
 
     ioctl(serialfc_fd, IOCTL_FASTCOM_GET_RS485, &status);

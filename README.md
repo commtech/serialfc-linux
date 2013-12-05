@@ -149,14 +149,19 @@ int main(void)
     int fd = 0;
     char odata[] = "Hello world!";
     char idata[20];
+    int file_status;
 
     /* Open port 0 (ttyS4) */
-    fd = open("/dev/ttyS4", O_RDWR);
+    fd = open("/dev/ttyS4", O_RDWR | O_NDELAY);
 
     if (fd == -1) {
         perror("open");
         return EXIT_FAILURE;
     }
+
+    /* Turn off O_NDELAY now that we have the port open */
+    file_status = fcntl(fd, F_GETFL, 0);
+    fcntl(fd, F_SETFL, file_status & ~O_NDELAY);
 
 #ifdef ASYNC_PCIE
     {
