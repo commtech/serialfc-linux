@@ -442,6 +442,7 @@ void fastcom_set_rs485_fscc(struct serialfc_port *port, int enable)
 {
     unsigned char orig_lcr;
     __u32 current_fcr, new_fcr;
+    __u32 bit_mask;
 
     orig_lcr = ioread8(port->addr + LCR_OFFSET);
     current_fcr = ioread32(port->card->bar2);
@@ -449,16 +450,29 @@ void fastcom_set_rs485_fscc(struct serialfc_port *port, int enable)
     iowrite8(0, port->addr + LCR_OFFSET); /* Ensure last LCR value is not 0xbf */
     iowrite8(ACR_OFFSET, port->addr + SPR_OFFSET); /* To allow access to ACR */
 
+    switch (port->channel) {
+    case 0:
+        bit_mask = 0x00040000;
+        break;
+
+    case 1:
+        bit_mask = 0x00400000;
+        break;
+
+    default:
+        bit_mask = 0x00000000;
+    }
+
     if (enable) {
         port->ACR |= 0x10;
-        new_fcr = current_fcr | (0x00040000 << port->channel);
+        new_fcr = current_fcr | bit_mask;
     }
     else {
         port->ACR &= ~0x10;
-        new_fcr = current_fcr & ~(0x00040000 << port->channel);
+        new_fcr = current_fcr & ~bit_mask;
     }
 
-    iowrite8(port->ACR, port->addr + ICR_OFFSET); /* Enable 950 trigger to ACR through ICR */
+    iowrite8(port->ACR, port->addr + ICR_OFFSET); /* DTR is active during transmission to turn on drivers */
     iowrite32(new_fcr, port->card->bar2);
 
     iowrite8(orig_lcr, port->addr + LCR_OFFSET);
@@ -501,10 +515,24 @@ void fastcom_get_rs485_fscc(struct serialfc_port *port, int *enabled)
 {
     __u32 current_fcr;
     int dtr_enable_active, transmitter_485_active;
+    __u32 bit_mask;
+
+    switch (port->channel) {
+    case 0:
+        bit_mask = 0x00040000;
+        break;
+
+    case 1:
+        bit_mask = 0x00400000;
+        break;
+
+    default:
+        bit_mask = 0x00000000;
+    }
 
     current_fcr = ioread32(port->card->bar2);
     dtr_enable_active = (port->ACR & 0x10) ? 1 : 0; /* DTR is active during transmission to turn on drivers */
-    transmitter_485_active = (current_fcr & (0x00040000 << port->channel)) ? 1 : 0;
+    transmitter_485_active = (current_fcr & bit_mask) ? 1 : 0;
 
     *enabled = (dtr_enable_active && transmitter_485_active) ? 1 : 0;
 }
