@@ -68,6 +68,7 @@ void fastcom_disable_rs485(struct serialfc_port *port);
 int fastcom_get_rs485(struct serialfc_port *port, int *enabled);
 
 int fastcom_set_clock_rate(struct serialfc_port *port, unsigned rate);
+int fastcom_set_clock_bits(struct serialfc_port *port, unsigned char *clock_data);
 
 int fastcom_set_isochronous(struct serialfc_port *port, int mode);
 int fastcom_enable_isochronous(struct serialfc_port *port, unsigned mode);
@@ -99,5 +100,9 @@ unsigned char fscc_get_frev(struct serialfc_port *port);
 
 int fscc_enable_async_mode(struct serialfc_port *port);
 int fscc_disable_async_mode(struct serialfc_port *port);
+
+__u8 fscc_get_FREV(struct serialfc_port *port);
+__u8 fscc_get_PREV(struct serialfc_port *port);
+__u16 fscc_get_PDEV(struct serialfc_port *port);
 
 #endif

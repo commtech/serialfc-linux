@@ -70,6 +70,8 @@ extern "C"
 #define IOCTL_FASTCOM_DISABLE_9BIT _IO(SERIALFC_IOCTL_MAGIC, 26)
 #define IOCTL_FASTCOM_GET_9BIT _IOR(SERIALFC_IOCTL_MAGIC, 27, unsigned *)
 
+#define IOCTL_FASTCOM_SET_CLOCK_BITS _IOW(SERIALFC_IOCTL_MAGIC, 28, const unsigned char[20])
+
 
 #ifdef __cplusplus
 }
