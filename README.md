@@ -68,6 +68,13 @@ insmod serialfc.ko
 insmod: error inserting 'serialfc.ko': -1 No such device
 ```
 
+If you are using an FSCC card for asynchronous communication only you can 
+enable asynchronous by default by specifying the `fscc_enable_async` option.
+
+```
+insmod serialfc.ko fscc_enable_async=1
+```
+
 _All driver load time options can be set in your modprobe.conf file for
 using upon system boot_
 
