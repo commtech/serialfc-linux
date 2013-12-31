@@ -141,6 +141,12 @@ enum FASTCOM_CARD_TYPE { CARD_TYPE_PCI, CARD_TYPE_PCIe, CARD_TYPE_FSCC, CARD_TYP
 #define IOCTL_FASTCOM_DISABLE_9BIT _IO(SERIALFC_IOCTL_MAGIC, 26)
 #define IOCTL_FASTCOM_GET_9BIT _IOR(SERIALFC_IOCTL_MAGIC, 27, unsigned *)
 
+//TODO: On version 3.X switch to to match Windows  (29). I'm leaving it for API stability
 #define IOCTL_FASTCOM_SET_CLOCK_BITS _IOW(SERIALFC_IOCTL_MAGIC, 28, const unsigned char[20])
+
+//TODO: On version 3.X switch to to match Windows (28-30). I'm leaving it for API stability
+#define IOCTL_FASTCOM_ENABLE_FIXED_BAUD_RATE _IOW(SERIALFC_IOCTL_MAGIC, 29, const unsigned)
+#define IOCTL_FASTCOM_DISABLE_FIXED_BAUD_RATE _IO(SERIALFC_IOCTL_MAGIC, 30)
+#define IOCTL_FASTCOM_GET_FIXED_BAUD_RATE _IOR(SERIALFC_IOCTL_MAGIC, 31, unsigned *)
 
 #endif

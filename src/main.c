@@ -204,6 +204,12 @@ int serialfc_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 		error_code = fastcom_get_9bit(port, (unsigned *)arg);
 		break;
 
+	case IOCTL_FASTCOM_ENABLE_FIXED_BAUD_RATE:
+	case IOCTL_FASTCOM_DISABLE_FIXED_BAUD_RATE:
+	case IOCTL_FASTCOM_GET_FIXED_BAUD_RATE:
+        error_code = -EPROTONOSUPPORT;
+        break;
+
 	default:
 		dev_dbg(port->device, "unknown ioctl 0x%x\n", cmd);
 		return -ENOTTY;
