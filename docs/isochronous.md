@@ -1,5 +1,19 @@
 # Isochronous
 
+| Mode | Description
+| ---- | -----------
+|	0    | Transmit using external RI#
+|	1    | Transmit using internal BRG
+|	2    | Receive using external DSR#
+|	3    | Transmit using external RI#, receive using external DSR#
+|	4    | Transmit using internal BRG, receive using external DSR#
+|	5    | Receive using internal BRG
+|	6    | Transmit using external RI#, receive using internal BRG
+|	7    | Transmit using internal BRG, receive using internal BRG
+|	8    | Transmit and receive using external RI#
+|	9    | Transmit clock is output on DTR#
+|	10   | Transmit clock is output on DTR#, receive using external DSR#
+
 ###### Support
 | Code         | Version
 | ------------ | --------
