@@ -367,7 +367,7 @@ struct serialfc_card *serialfc_card_find(struct pci_dev *pdev,
 }
 
 MODULE_LICENSE("GPL");
-MODULE_VERSION("2.2.0");
+MODULE_VERSION("2.2.1");
 MODULE_AUTHOR("William Fagan <willf@commtech-fastcom.com>");
 
 MODULE_DESCRIPTION("Registers the UARTs on the async series of Commtech cards "\

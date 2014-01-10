@@ -1,12 +1,15 @@
 # ChangeLog
 
+## [2.2.1](https://github.com/commtech/serialfc-linux/releases/tag/v2.2.1) (01/10/2014)
+- Added fixed baud rate placeholders for external library development
+
 ## [2.2.0](https://github.com/commtech/serialfc-linux/releases/tag/v2.2.0) (12/06/2013)
 - Added support for isochronous mode 9 and 10
 - Added check for FSCC support before frame length changes
 - Added option to enable asynchronous support by default on FSCC cards
 - Added support for setting the FSCC clock frequency using user generated clock bits
 - Fixed enabling RS485 on the 2nd port of FSCC cards
-    
+
 ## [2.1.1](https://github.com/commtech/serialfc-linux/releases/tag/v2.1.1) (11/19/2013)
 - Improve port initialization to ensure trigger levels are programmable
 
