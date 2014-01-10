@@ -1310,13 +1310,11 @@ int fastcom_get_frame_length(struct serialfc_port *port, unsigned *num_chars)
     return status;
 }
 
-//TODO: 9-Bit isn't supported in Linux
 int fastcom_set_9bit(struct serialfc_port *port, int enable)
 {
     return -EPROTONOSUPPORT;
 }
 
-//TODO: 9-Bit isn't supported in Linux
 int fastcom_get_9bit(struct serialfc_port *port, int *enabled)
 {
     return -EPROTONOSUPPORT;
