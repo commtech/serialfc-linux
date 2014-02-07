@@ -1041,6 +1041,10 @@ int fastcom_set_clock_bits_fscc(struct serialfc_port *port,
 		for (j = 7; j >= 0; j--) {
 			int bit = ((clock_data[i] >> j) & 1);
 
+            /* This is required for 4-port cards. I'm not sure why at the
+               moment */
+			data[data_index++] = new_fcr_value;
+
 			if (bit)
 				new_fcr_value |= dta_value; /* Set data bit */
 			else
@@ -1048,6 +1052,8 @@ int fastcom_set_clock_bits_fscc(struct serialfc_port *port,
 
 			data[data_index++] = new_fcr_value |= clk_value; /* Set clock bit */
 			data[data_index++] = new_fcr_value &= ~clk_value; /* Clear clock bit */
+
+			new_fcr_value = orig_fcr_value & 0xfffff0f0;
 		}
 	}
 
@@ -1066,14 +1072,73 @@ int fastcom_set_clock_bits_fscc(struct serialfc_port *port,
     return 0;
 }
 
-int fastcom_set_clock_bits(struct serialfc_port *port, 
-                           unsigned char *clock_data)
+
+// Copied from old code. Needs a major code cleanup. TODO
+// ICS307-02
+#define MPIO_SDTA 0x01 // Each bit of MPIOLVL register
+#define MPIO_SCLK 0x02
+#define MPIO_SSTB 0x04
+
+int fastcom_set_clock_bits_pci(struct serialfc_port *port,
+                               __u32 clock_data)
+{
+    unsigned long tempValue = 0;
+    unsigned char data = 0;
+    unsigned char saved = 0;
+    unsigned long i = 0;
+
+    tempValue = (clock_data & 0x00ffffff);
+
+    data = saved = ioread8(port->addr + MPIOLVL_OFFSET); // Save MPIO pin state
+
+    for (i = 0; i < 24; i++) {
+        //data bit set
+        if ((tempValue & 0x800000) != 0)
+            data |= MPIO_SDTA;
+        else
+            data &= ~MPIO_SDTA;
+
+        iowrite8(data, port->addr + MPIOLVL_OFFSET);
+        //KeStallExecutionProcessor(20);
+
+        //clock high, data still there
+        data |= MPIO_SCLK;
+        iowrite8(data, port->addr + MPIOLVL_OFFSET);
+        //KeStallExecutionProcessor(20);
+
+        //clock low, data still there
+        data &= MPIO_SDTA;
+        iowrite8(data, port->addr + MPIOLVL_OFFSET);
+        //KeStallExecutionProcessor(20);
+
+        tempValue <<= 1;
+    }
+
+    data &= 0xF8;
+    data |= MPIO_SSTB; // strobe on
+    iowrite8(data, port->addr + MPIOLVL_OFFSET);
+    //KeStallExecutionProcessor(20);
+
+    data &= ~MPIO_SSTB; // all off
+    iowrite8(data, port->addr + MPIOLVL_OFFSET);
+    //KeStallExecutionProcessor(20);
+
+    //Put MPIO pins back to saved state.
+    iowrite8(saved, port->addr + MPIOLVL_OFFSET);
+printk("\a");
+    return 0;
+}
+
+int fastcom_set_clock_bits(struct serialfc_port *port, void *clock_data)
 {
     int status;
 
     switch (fastcom_get_card_type(port)) {
     case CARD_TYPE_FSCC:
-        status = fastcom_set_clock_bits_fscc(port, clock_data);
+        status = fastcom_set_clock_bits_fscc(port, (unsigned char *)clock_data);
+        break;
+    case CARD_TYPE_PCI:
+        status = fastcom_set_clock_bits_pci(port, *((unsigned long *)clock_data));
         break;
 
     default:

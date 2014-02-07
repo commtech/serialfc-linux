@@ -21,7 +21,11 @@
 #ifndef CALCULATE_CLOCK_BITS_H
 #define CALCULATE_CLOCK_BITS_H
 
-int calculate_clock_bits(unsigned long freq, unsigned long ppm, 
+#include <stdint.h>
+
+int calculate_clock_bits(unsigned long freq, unsigned long ppm,
                          unsigned char *clock_bits);
+
+int calculate_clock_bits_335(unsigned long freq, uint32_t *clock_bits);
 
 #endif

@@ -22,7 +22,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-//#include "../fsccdrv.h"
+
+#include "calculate-clock-bits.h"
+
 #define result_array_size 512
 
 struct ResultStruct {
@@ -130,6 +132,18 @@ drop:
 
 if(t==0)    return 0;
 else return 1;
+}
+
+int calculate_clock_bits_335(unsigned long freq, uint32_t *progbytes)
+{
+    int t;
+
+    t = GetICS30702Data(freq, progbytes);
+
+    if (t == 0)
+        return 0;
+    else
+        return 1;
 }
 
 
@@ -954,3 +968,236 @@ finished:
     return 0;
 
 }//end of GetICS30703Bits
+
+int GetICS30702Data(unsigned rate, uint32_t *progbytes)
+{
+    #define STARTWRD 0x1e05
+    #define MIDWRD   0x1e04
+    #define ENDWRD   0x1e00
+    
+    unsigned long bestVDW=1;    //Best calculated VCO Divider Word
+    unsigned long bestRDW=1;    //Best calculated Reference Divider Word
+    unsigned long bestOD=1;     //Best calculated Output Divider
+    unsigned long result=0;
+    unsigned long t=0;
+    unsigned long j=0;
+    unsigned long temp=0;
+    unsigned long vdw=1;        //VCO Divider Word
+    unsigned long rdw=1;        //Reference Divider Word
+    unsigned long od=1;         //Output Divider
+    unsigned long lVDW=1;       //Lowest vdw
+    unsigned long lRDW=1;       //Lowest rdw
+    unsigned long lOD=1;        //Lowest OD
+    unsigned long hVDW=1;       //Highest vdw
+    unsigned long hRDW=1;       //Highest rdw
+    unsigned long hOD=1;        //Highest OD
+    unsigned long hi;       //initial range freq Max
+    unsigned long low;  //initial freq range Min
+    unsigned long check;        //Calculated clock
+    unsigned long clk1;     //Actual clock 1 output
+    unsigned long inFreq=18432000;  //Input clock frequency
+    unsigned long range1=0;     //Desired frequency range limit per ics307 mfg spec.
+    unsigned long range2=0;     ////Desired frequency range limit per ics307 mfg spec.
+    int odskip=0;
+
+    //DBGP("SerialSetClock Executing %d\n",*rate);
+
+    hi = (rate + (rate / 10));
+    low = (rate - (rate / 10));
+
+    od = 2;
+    while (od <= 10)
+    {
+        switch(od)  //check maximum frequency with given OD for industrial temp chips
+        {
+        case 2:
+            if(rate>180000000)
+                odskip=1;
+            break;
+        case 3:
+            if(rate>120000000)
+                odskip=1;
+            break;
+        case 4:
+            if(rate>90000000)
+                odskip=1;
+            break;
+        case 5:
+            if(rate>72000000)
+                odskip=1;
+            break;
+        case 6:
+            if(rate>60000000)
+                odskip=1;
+            break;
+        case 7:
+            if(rate>50000000)
+                odskip=1;
+            break;
+        case 8:
+            if(rate>45000000)
+                odskip=1;
+            break;
+        case 9: //OD=9 not allowed
+            odskip=1;
+        case 10:
+            if(rate>36000000)
+                odskip=1;
+            break;
+        default:
+            //DBGP("Case 1 Invalid OD = %ld.\n",od);
+            return 1;
+        }
+
+        rdw = 1;
+        while ( (rdw <= 127) && (odskip==0) )
+        {
+            vdw = 4;
+            while (vdw <= 511)
+            {
+                check = (((inFreq * 2) / ((rdw + 2)*od)) * (vdw + 8) ); //calculate a check frequency
+                range1 = ((inFreq * 2 * (vdw + 8)) / (rdw + 2));
+                range2 = (inFreq / (rdw + 2));
+                //Calculate operating ranges
+
+                if ( ((range1) > 60000000) && ((range1) < 360000000) && ((range2) > 200000) )   //check operating ranges
+                {
+                    if (check == low)   //If this combination of variables == the current lowest set
+                    {
+                        if (lRDW > rdw) //If this combination has a lower rdw
+                        {
+                            lVDW=vdw;
+                            lRDW=rdw;
+                            lOD=od;
+                            low=check;
+                        }
+                        else if ((lRDW == rdw) && (lVDW < vdw)) //If this combo has the same rdw then take the higher vdw
+                        {
+                            lVDW=vdw;
+                            lRDW=rdw;
+                            lOD=od;
+                            low=check;
+                        }
+
+                    }
+                    else if (check == hi)   //If this combination of variables == the current lowest set
+                    {
+                        if (hRDW > rdw) //If this combination has a lower rdw
+                        {
+                            hVDW=vdw;
+                            hRDW=rdw;
+                            hOD=od;
+                            hi=check;
+                        }
+                        else if ((hRDW == rdw) && (hVDW < vdw)) //If this combo has the same rdw then take the higher vdw   
+                        {
+                            hVDW=vdw;
+                            hRDW=rdw;
+                            hOD=od;
+                            hi=check;
+                        }
+
+                    }
+
+
+                    if ((check > low) && (check < hi))      //if difference is less than previous difference
+                    {
+                        if (check > rate)    //if the new combo is larger than the rate, new hi combination
+                        {
+                            hi=check;
+                            hVDW=vdw;
+                            hRDW=rdw;
+                            hOD=od;
+                        }
+                            
+                        else    //if the new combo is less than the rate, new low combination
+                        {
+                            low=check;
+                            lVDW = vdw;
+                            lRDW = rdw;
+                            lOD = od;
+                        }
+                }
+            }
+
+            vdw++;
+        }
+
+        rdw++;
+    }
+    odskip=0;
+    od++;
+    if (od==9)
+        od++;
+    }
+
+    if ((hi - rate) < (rate - low))
+    {
+        bestVDW=hVDW;
+        bestRDW=hRDW;
+        bestOD=hOD;
+        clk1=hi;
+    }
+    else
+    {
+        bestVDW=lVDW;
+        bestRDW=lRDW;
+        bestOD=lOD;
+        clk1=low;
+    }
+    switch(bestOD)
+    {
+    case 2:
+        result=0x11;
+        break;
+    case 3:
+        result=0x16;
+        break;
+    case 4:
+        result=0x13;
+        break;
+    case 5:
+        result=0x14;
+        break;
+    case 6:
+        result=0x17;
+        break;
+    case 7:
+        result=0x15;
+        break;
+    case 8:
+        result=0x12;
+        break;
+    case 10:
+        result=0x10;
+        break;
+    default:
+        //DBGP("Case 2 Invalid OD=%ld.\n",od);
+        return 1;
+
+    }
+    range1 = (inFreq * 2 * ((bestVDW + 8)/(bestRDW + 2)));
+    range2 = (inFreq/(bestRDW + 2));
+    clk1 = (((inFreq * 2) / ((bestRDW + 2)*bestOD)) * (bestVDW + 8) );
+//      DBGP(" 60 MHz < %d MHz < 360 MHz\n", range1);
+//      DBGP(" 200 kHz < %d kHz \n", range2*1000);
+    result<<=9;
+    result|=bestVDW;
+    result<<=7;
+    result|=bestRDW;
+
+    *progbytes = result;
+//      result|=0x200000;   //1 = set levels to TTL, 0 = CMOS
+
+//      DBGP("Clock bytes = %X\n",result);
+
+    //DBGP("The rate clock control bytes are: %X\n",result);
+//      DBGP("The rate frequendy is: %dHz\n", rate);
+//      DBGP("The base clock is: %dHz\n", inFreq);
+//      DBGP("High: %d    ",hi);
+//      DBGP("Low: %d.\n",low);
+    //DBGP("The best calculated clock is: %dHz\n", clk1);
+//      DBGP("The best VDW = %d  RDW = %d  OD = %d.\n", bestVDW, bestRDW, bestOD);
+//      DBGP("CH_ID = %d \n", extension->chid);
+    return 0;
+}

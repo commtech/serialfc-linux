@@ -153,7 +153,7 @@ int serialfc_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 		break;
 
     case IOCTL_FASTCOM_SET_CLOCK_BITS:
-		error_code = fastcom_set_clock_bits(port, (char *)arg);
+		error_code = fastcom_set_clock_bits(port, (void *)arg);
 		break;
 
     case IOCTL_FASTCOM_ENABLE_ISOCHRONOUS:
