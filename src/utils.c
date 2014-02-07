@@ -232,6 +232,8 @@ int fastcom_set_tx_trigger_fscc(struct serialfc_port *port, unsigned value)
     iowrite8(TTL_OFFSET, port->addr + SPR_OFFSET); /* To allow access to TTL */
     iowrite8((unsigned char)value, port->addr + ICR_OFFSET); /* To allow access to TTL */
 
+    /* TODO: When 950 trigger levels are fixed, use the TTLH value also */
+
     iowrite8(orig_lcr, port->addr + LCR_OFFSET); /* Ensure last LCR value is not 0xbf */
 
     return 0;
@@ -339,6 +341,8 @@ int fastcom_set_rx_trigger_fscc(struct serialfc_port *port, unsigned value)
     iowrite8(0, port->addr + LCR_OFFSET); /* Ensure last LCR value is not 0xbf */
     iowrite8(RTL_OFFSET, port->addr + SPR_OFFSET); /* To allow access to RTL */
     iowrite8((unsigned char)value, port->addr + ICR_OFFSET); /* Set the trigger level to RTL through ICR */
+
+    /* TODO: When 950 trigger levels are fixed, use the TTLH value also */
 
     iowrite8(orig_lcr, port->addr + LCR_OFFSET);
 
@@ -1443,18 +1447,20 @@ void fastcom_init_triggers(struct serialfc_port *port)
         break;
 
     case CARD_TYPE_FSCC:
-        iowrite8(0x00, port->addr + LCR_OFFSET);
         iowrite8(0x01, port->addr + FCR_OFFSET); /* Enable FIFO (combined with enhanced enables 950 mode) */
 
         iowrite8(0xbf, port->addr + LCR_OFFSET); /* Set to 0xbf to access 650 registers */
         iowrite8(0x10, port->addr + EFR_OFFSET); /* Enable enhanced mode */
 
+        /* Temporarily disable 950 trigger levels due to either interrupts not
+           firing or not being handled correctly. */
+#if 0
         iowrite8(0x00, port->addr + LCR_OFFSET); /* Ensure last LCR value is not 0xbf */
         iowrite8(ACR_OFFSET, port->addr + SPR_OFFSET); /* To allow access to ACR */
         port->ACR = 0x20;
         iowrite8(port->ACR, port->addr + ICR_OFFSET); /* Enable 950 trigger to ACR through ICR */
-
-        iowrite8(0x00, port->addr + LCR_OFFSET);
+#endif
+        port->ACR = 0x00;
         break;
 
     default:
