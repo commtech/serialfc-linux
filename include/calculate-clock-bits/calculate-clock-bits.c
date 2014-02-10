@@ -48,6 +48,7 @@ struct IcpRsStruct {
 };
 
 int GetICS30703Data(unsigned long desired, unsigned long ppm, struct ResultStruct *theOne, struct IcpRsStruct *theOther, unsigned char *progdata);
+int GetICS30702Data(unsigned rate, uint32_t *progbytes);
 
 int calculate_clock_bits(unsigned long freq,unsigned long ppm, unsigned char *progbytes)
 {
