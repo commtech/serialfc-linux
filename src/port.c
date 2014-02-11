@@ -129,7 +129,7 @@ struct serialfc_port *serialfc_port_new(struct serialfc_card *card, unsigned cha
     fastcom_set_echo_cancel(port, DEFAULT_ECHO_CANCEL);
     fastcom_set_isochronous(port, DEFAULT_ISOCHRONOUS);
     fastcom_set_frame_length(port, DEFAULT_FRAME_LENGTH);
-    
+
     if (fscc_enable_async && fastcom_get_card_type(port) == CARD_TYPE_FSCC)
         fscc_enable_async_mode(port);
 
@@ -151,7 +151,14 @@ struct serialfc_port *serialfc_port_new(struct serialfc_card *card, unsigned cha
 		return 0;
 	}
 
-	dev_info(port->device, "%s\n", serialfc_card_get_name(port->card));
+	if (fastcom_get_card_type(port) == CARD_TYPE_FSCC) {
+		dev_info(port->device, "%s (%x.%02x)\n",
+				 serialfc_card_get_name(port->card),
+				 fscc_get_PREV(port), fscc_get_FREV(port));
+	}
+	else {
+		dev_info(port->device, "%s\n", serialfc_card_get_name(port->card));
+	}
 
 	return port;
 }
