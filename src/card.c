@@ -139,6 +139,7 @@ struct serialfc_card *serialfc_card_new(struct pci_dev *pdev,
 	case SFSCC_4_UA_CPCI_ID:
 	case SFSCC_4_UA_LVDS_ID:
 	case SFSCC_UA_LVDS_ID:
+	case FSCCe_4_UA_ID:
 		board = &fscc_board;
 		break;
 	}
@@ -269,6 +270,8 @@ char *serialfc_card_get_name(struct serialfc_card *card)
 	case SFSCC_4_CPCI_ID:
 	case SFSCC_4_UA_CPCI_ID:
 		return "SuperFSCC/4 cPCI";
+	case FSCCe_4_UA_ID:
+		return "FSCC/4 PCIe";
 	default:
 		return "Unknown Device";
 	}
