@@ -1,5 +1,9 @@
 # ChangeLog
 
+## [2.3.0](https://github.com/commtech/serialfc-linux/releases/tag/v2.3.0) (02/14/2014)
+- Fixed 950 trigger level issue causing missing interrupts
+- Added support for setting the clock rate on 335 cards
+
 ## [2.2.1](https://github.com/commtech/serialfc-linux/releases/tag/v2.2.1) (01/10/2014)
 - Added fixed baud rate placeholders for external library development
 
