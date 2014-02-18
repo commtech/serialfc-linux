@@ -364,10 +364,14 @@ dpkg-reconfigure setserial
 ```
 
 
-## Dependencies
+## Build Dependencies
+- Kernel Build Tools (GCC, make, kernel headers, etc)
+
+
+## Run-time Dependencies
+- OS: Linux
 - Base Installation: >= 2.6.16 (might work with a lower version)
 - Sysfs Support: >= 2.6.25
-- Other: gcc, make, kernel headers
 
 
 ## API Compatibility
