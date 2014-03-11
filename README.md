@@ -11,7 +11,7 @@ out the latest code you will need Git and to run the following in a terminal.
 git clone git://github.com/commtech/serialfc-linux.git serialfc
 ```
 
-_You can also download driver packages directly from our
+You can also download driver packages directly from our
 [website](http://www.commtech-fastcom.com/CommtechSoftware.html).
 
 ##### Switch To Stable Version
@@ -364,10 +364,14 @@ dpkg-reconfigure setserial
 ```
 
 
-## Dependencies
+## Build Dependencies
+- Kernel Build Tools (GCC, make, kernel headers, etc)
+
+
+## Run-time Dependencies
+- OS: Linux
 - Base Installation: >= 2.6.16 (might work with a lower version)
 - Sysfs Support: >= 2.6.25
-- Other: gcc, make, kernel headers
 
 
 ## API Compatibility
