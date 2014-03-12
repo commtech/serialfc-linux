@@ -1,9 +1,16 @@
 # Frame Length
 
-###### Support
-| Code         | Version
-| ------------ | --------
-| `serialfc-linux` | `v2.0.0`
+###### Code Support
+| Code | Version |
+| ---- | ------- |
+| serialfc-linux | 2.0.0 |
+
+###### Card Support
+| Card Family | Supported |
+| ----------- |:-----:|
+| FSCC (16C950) | Yes |
+| Async-335 (17D15X) | No |
+| Async-PCIe (17V35X) | No |
 
 
 ## Get
@@ -11,6 +18,10 @@
 ```c
 IOCTL_FASTCOM_GET_FRAME_LENGTH
 ```
+
+| System Error | Value | Cause |
+| ------------ | -----:| ----- |
+| `EPROTONOSUPPORT` | 93 (0x5D) | Not supported on this family of cards |
 
 ###### Examples
 ```c
@@ -39,6 +50,11 @@ cat /sys/class/serialfc/serialfc0/settings/frame_length
 IOCTL_FASTCOM_ENABLE_FRAME_LENGTH
 ```
 
+| System Error | Value | Cause |
+| ------------ | -----:| ----- |
+| `EINVAL` | 22 (0x16) | Invalid parameter |
+| `EPROTONOSUPPORT` | 93 (0x5D) | Not supported on this family of cards |
+
 ###### Examples
 Transmit 4 bytes per frame.
 ```c
@@ -65,6 +81,10 @@ echo 1 > /sys/class/serialfc/serialfc0/settings/frame_length
 IOCTL_FASTCOM_DISABLE_FRAME_LENGTH
 ```
 
+| System Error | Value | Cause |
+| ------------ | -----:| ----- |
+| `EPROTONOSUPPORT` | 93 (0x5D) | Not supported on this family of cards |
+
 ###### Examples
 ```c
 #include <serialfc.h>
@@ -85,4 +105,4 @@ echo 0 > /sys/class/serialfc/serialfc0/settings/frame_length
 
 
 ### Additional Resources
-- Complete example: [`examples\frame_length.c`](https://github.com/commtech/serialfc-linux/blob/master/examples/frame_length.c)
+- Complete example: [`examples/frame_length.c`](../examples/frame_length.c)

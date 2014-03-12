@@ -1,9 +1,21 @@
 # External Transmit
 
-###### Support
-| Code         | Version
-| ------------ | --------
-| `serialfc-linux` | `v2.0.0`
+###### Code Support
+| Code | Version |
+| ---- | ------- |
+| serialfc-linux | 2.0.0 |
+
+###### Card Support
+| Card Family | Supported |
+| ----------- |:-----:|
+| FSCC (16C950) | Yes |
+| Async-335 (17D15X) | No |
+| Async-PCIe (17V35X) | No |
+
+###### Operating Range
+| Card Family | Range |
+| ----------- | ----- |
+| FSCC (16C950) | 0 - 8191 |
 
 
 ## Get
@@ -11,6 +23,10 @@
 ```c
 IOCTL_FASTCOM_GET_EXTERNAL_TRANSMIT
 ```
+
+| System Error | Value | Cause |
+| ------------ | -----:| ----- |
+| `EPROTONOSUPPORT` | 93 (0x5D) | Not supported on this family of cards |
 
 ###### Examples
 ```c
@@ -39,6 +55,11 @@ cat /sys/class/serialfc/serialfc0/settings/external_transmit
 IOCTL_FASTCOM_ENABLE_EXTERNAL_TRANSMIT
 ```
 
+| System Error | Value | Cause |
+| ------------ | -----:| ----- |
+| `EINVAL` | 22 (0x16) | Invalid parameter |
+| `EPROTONOSUPPORT` | 93 (0x5D) | Not supported on this family of cards |
+
 ###### Examples
 Enable external transmit on 4 bytes.
 ```c
@@ -65,6 +86,10 @@ echo 1 > /sys/class/serialfc/serialfc0/settings/external_transmit
 IOCTL_FASTCOM_DISABLE_EXTERNAL_TRANSMIT
 ```
 
+| System Error | Value | Cause |
+| ------------ | -----:| ----- |
+| `EPROTONOSUPPORT` | 93 (0x5D) | Not supported on this family of cards |
+
 ###### Examples
 ```c
 #include <serialfc.h>
@@ -85,4 +110,4 @@ echo 0 > /sys/class/serialfc/serialfc0/settings/external_transmit
 
 
 ### Additional Resources
-- Complete example: [`examples\external_transmit.c`](https://github.com/commtech/serialfc-linux/blob/master/examples/external_transmit.c)
+- Complete example: [`examples/external_transmit.c`](../examples/external_transmit.c)

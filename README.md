@@ -68,7 +68,7 @@ insmod serialfc.ko
 insmod: error inserting 'serialfc.ko': -1 No such device
 ```
 
-If you are using an FSCC card for asynchronous communication only you can 
+If you are using an FSCC card for asynchronous communication only you can
 enable asynchronous by default by specifying the `fscc_enable_async` option.
 
 ```
@@ -137,7 +137,7 @@ echo 03000000 > /sys/class/fscc/fscc0/registers/fcr
 There is documentation for each specific function listed below, but lets get started
 with a quick programming example for fun.
 
-_This tutorial has already been set up for you at_ 
+_This tutorial has already been set up for you at_
 [`serialfc/examples/tutorial.c`](https://github.com/commtech/serialfc-linux/tree/master/examples/tutorial.c).
 
 Create a new C file (named tutorial.c) with the following code.
@@ -233,25 +233,32 @@ You have now transmitted and received an asynchronous frame!
 There are likely other configuration options you will need to set up for your
 own program. All of these options are described on their respective documentation page.
 
-- [Connect](https://github.com/commtech/serialfc-linux/blob/master/docs/connect.md)
-- [Clock Rate](https://github.com/commtech/serialfc-linux/blob/master/docs/clock_rate.md)
-- [Echo Cancel](https://github.com/commtech/serialfc-linux/blob/master/docs/echo_cancel.md)
-- [External Transmit](https://github.com/commtech/serialfc-linux/blob/master/docs/external_transmit.md)
-- [Frame Length](https://github.com/commtech/serialfc-linux/blob/master/docs/frame_length.md)
-- [Isochronous](https://github.com/commtech/serialfc-linux/blob/master/docs/isochronous.md)
-- [9-Bit Protocol](https://github.com/commtech/serialfc-linux/blob/master/docs/nine_bit.md)
-- [RS485](https://github.com/commtech/serialfc-linux/blob/master/docs/rs485.md)
-- [RX Trigger](https://github.com/commtech/serialfc-linux/blob/master/docs/rx_trigger.md)
-- [TX Trigger](https://github.com/commtech/serialfc-linux/blob/master/docs/tx_trigger.md)
-- [Sample Rate](https://github.com/commtech/serialfc-linux/blob/master/docs/sample_rate.md)
-- [Termination](https://github.com/commtech/serialfc-linux/blob/master/docs/termination.md)
-- [Write](https://github.com/commtech/serialfc-linux/blob/master/docs/write.md)
-- [Read](https://github.com/commtech/serialfc-linux/blob/master/docs/read.md)
-- [Disconnect](https://github.com/commtech/serialfc-linux/blob/master/docs/disconnect.md)
+- [Connect](docs/connect.md)
+- [Card Type](docs/card-type.md)
+- [Clock Rate](docs/clock-rate.md)
+- [Echo Cancel](docs/echo-cancel.md)
+- [External Transmit](docs/external-transmit.md)
+- [Frame Length](docs/frame-length.md)
+- [Isochronous](docs/isochronous.md)
+- [9-Bit Protocol](docs/nine-bit.md)
+- [Read](docs/read.md)
+- [RS485](docs/rs485.md)
+- [RX Trigger](docs/rx-trigger.md)
+- [Sample Rate](docs/sample-rate.md)
+- [Termination](docs/termination.md)
+- [TX Trigger](docs/tx-trigger.md)
+- [Write](docs/write.md)
+- [Disconnect](docs/disconnect.md)
+
+There are also multiple code libraries to make development easier.
+- [C](https://github.com/commtech/cserialfc/)
+- [C++](https://github.com/commtech/cppserialfc/)
+- [.NET](https://github.com/commtech/netserialfc/)
+- [Python](https://github.com/commtech/pyserialfc/)
 
 
 ### 422/X-PCIe Differences
-The 422/X-PCIe family of cards use DTR to manage RS485. This causes complications when using the Linux 
+The 422/X-PCIe family of cards use DTR to manage RS485. This causes complications when using the Linux
 serial driver. There are a couple extra steps needed in your software to use the card correctly.
 
 ##### 422 Mode
@@ -265,7 +272,7 @@ ioctl(fd, TIOCMSET, &mode);
 // Other 422 initialization code
 
 ```
-        
+
 ##### 485 Mode
 ```
 int mode = 0;
@@ -280,7 +287,7 @@ ioctl(ttys_fd, TIOCMSET, &mode);
 
 
 ### Custom Baud Rates
-Using custom baud rates in Linux require a few modifications. 
+Using custom baud rates in Linux require a few modifications.
 ```
 #include <termios.h>
 #include <sys/ioctl.h>
@@ -313,7 +320,7 @@ This can also be achieved using the `setserial` utlity and the `baud_base`,
 Here is an example of setting a baud rate of 1 MHz assuming a clock frequency
 of 16 MHz and a sampling rate of 16.
 ```
-# setserial /dev/ttyS# baud_base 1000000   // clock frequency / sampling rate 
+# setserial /dev/ttyS# baud_base 1000000   // clock frequency / sampling rate
 # setserial /dev/ttyS# spd_cust            // turn the spd_cust flag ON
 # setserial /dev/ttyS# divisor 1           // spd_cust will use a divisor of 1
 ```
@@ -347,7 +354,7 @@ need to recompile the kernel for it to take effect. The line you need to
 change in the .config file is SERIAL_8250_RUNTIME_UARTS.
 
 ##### The `open` call is hanging. What am I doing wrong?
-There are a couple possibilities. If you are using an FSCC card, make sure 
+There are a couple possibilities. If you are using an FSCC card, make sure
 you can have asynchronous mode enabled in the FCR register. Also, some
 of the older FSCC firmware versions require you to open the port in O_NONBLOCK
 mode.

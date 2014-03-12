@@ -1,16 +1,14 @@
 # Read
 
-
-###### Support
-| Code             | Version
-| ---------------- | --------
-| `serialfc-linux` | `v2.0.0`
+###### Code Support
+| Code | Version |
+| ---- | ------- |
+| serialfc-linux | 2.0.0 |
 
 
 ## Read
 ### Function
-The Linux [`read`](http://linux.die.net/man/3/read)
-is used to read data from the port.
+The Linux [`read`](http://linux.die.net/man/3/read) is used to read data from the port.
 
 ###### Examples
 ```c
@@ -31,4 +29,4 @@ cat /dev/serialfc0
 
 
 ### Additional Resources
-- Complete example: [`examples\tutorial.c`](https://github.com/commtech/serialfc-linux/blob/master/examples/tutorial.c)
+- Complete example: [`examples/tutorial.c`](../examples/tutorial.c)

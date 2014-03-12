@@ -1,15 +1,13 @@
 # Write
 
-
-###### Support
-| Code             | Version
-| ---------------- | --------
-| `serialfc-linux` | `v2.0.0`
+###### Code Support
+| Code | Version |
+| ---- | ------- |
+| serialfc-linux | 2.0.0 |
 
 
 ## Write
-The Linux [`write`](http://linux.die.net/man/3/write)
-is used to write data to the port.
+The Linux [`write`](http://linux.die.net/man/3/write) is used to write data to the port.
 
 ###### Examples
 ### Function
@@ -31,4 +29,4 @@ echo "Hello world!" > /dev/serialfc0
 
 
 ### Additional Resources
-- Complete example: [`examples\tutorial.c`](https://github.com/commtech/serialfc-linux/blob/master/examples/tutorial.c)
+- Complete example: [`examples/tutorial.c`](../examples/tutorial.c)

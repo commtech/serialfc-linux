@@ -1,9 +1,24 @@
 # Clock Rate
 
-###### Support
-| Code         | Version
-| ------------ | --------
-| `serialfc-linux` | `v2.0.0`
+###### Code Support
+| Code | Version |
+| ---- | ------- |
+| serialfc-linux | 2.0.0 |
+
+###### Card Support
+| Card Family | Supported |
+| ----------- |:-----:|
+| FSCC (16C950) | Yes |
+| Async-335 (17D15X) | Yes |
+| Async-PCIe (17V35X) | Not required |
+
+
+###### Operating Range
+| Card Family | Range |
+| ----------- | ----- |
+| FSCC (16C950) | 200 Hz - 270 MHz |
+| Async-335 (17D15X) | 6 Mhz - 180 Mhz |
+| Async-PCIe (17V35X) | Not required |
 
 
 
@@ -12,6 +27,11 @@
 ```c
 IOCTL_FASTCOM_SET_CLOCK_RATE
 ```
+
+| System Error | Value | Cause |
+| ------------ | -----:| ----- |
+| `EINVAL` | 22 (0x16) | Invalid parameter |
+| `EPROTONOSUPPORT` | 93 (0x5D) | Not supported on this family of cards |
 
 ###### Examples
 ```c
@@ -33,4 +53,4 @@ echo 1 > /sys/class/serialfc/serialfc0/settings/clock_rate
 
 
 ### Additional Resources
-- Complete example: [`examples\clock_rate.c`](https://github.com/commtech/serialfc-linux/blob/master/examples/clock_rate.c)
+- Complete example: [`examples/clock_rate.c`](../examples/clock_rate.c)

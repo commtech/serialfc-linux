@@ -1,9 +1,16 @@
 # Termination
 
-###### Support
-| Code         | Version
-| ------------ | --------
-| `serialfc-linux` | `v2.0.0`
+###### Code Support
+| Code | Version |
+| ---- | ------- |
+| serialfc-linux | 2.0.0 |
+
+###### Card Support
+| Card Family | Supported |
+| ----------- |:-----:|
+| FSCC (16C950) | No |
+| Async-335 (17D15X) | No |
+| Async-PCIe (17V35X) | Yes |
 
 
 ## Get
@@ -11,6 +18,10 @@
 ```c
 IOCTL_FASTCOM_GET_TERMINATION
 ```
+
+| System Error | Value | Cause |
+| ------------ | -----:| ----- |
+| `EPROTONOSUPPORT` | 93 (0x5D) | Not supported on this family of cards |
 
 ###### Examples
 ```c
@@ -38,6 +49,10 @@ cat /sys/class/serialfc/serialfc0/settings/termination
 ```c
 IOCTL_FASTCOM_ENABLE_TERMINATION
 ```
+
+| System Error | Value | Cause |
+| ------------ | -----:| ----- |
+| `EPROTONOSUPPORT` | 93 (0x5D) | Not supported on this family of cards |
 
 ###### Examples
 ```c
@@ -84,4 +99,4 @@ echo 0 > /sys/class/serialfc/serialfc0/settings/termination
 
 
 ### Additional Resources
-- Complete example: [`examples\termination.c`](https://github.com/commtech/serialfc-linux/blob/master/examples/termination.c)
+- Complete example: [`examples/termination.c`](../examples/termination.c)
