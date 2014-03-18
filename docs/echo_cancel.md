@@ -1,9 +1,16 @@
 # Echo Cancel
 
-###### Support
-| Code         | Version
-| ------------ | --------
-| `serialfc-linux` | `v2.0.0`
+###### Code Support
+| Code | Version |
+| ---- | ------- |
+| serialfc-linux | 2.0.0 |
+
+###### Card Support
+| Card Family | Supported |
+| ----------- |:-----:|
+| FSCC (16C950) | Yes |
+| Async-335 (17D15X) | Yes |
+| Async-PCIe (17V35X) | Yes |
 
 
 ## Get
@@ -84,4 +91,4 @@ echo 0 > /sys/class/serialfc/serialfc0/settings/echo_cancel
 
 
 ### Additional Resources
-- Complete example: [`examples\echo_cancel.c`](https://github.com/commtech/serialfc-linux/blob/master/examples/echo_cancel.c)
+- Complete example: [`examples/echo_cancel.c`](../examples/echo_cancel.c)
