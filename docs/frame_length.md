@@ -1,5 +1,7 @@
 # Frame Length
 
+The frame length specifies the number of bytes that get transmitted between the start and stop bits. The standard asynchronous serial communication protocol uses a frame length of one.
+
 ###### Code Support
 | Code | Version |
 | ---- | ------- |

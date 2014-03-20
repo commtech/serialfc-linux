@@ -1,5 +1,7 @@
 # TX Trigger
 
+The TX FIFO trigger level generates an interrupt whenever the data level in the transmit FIFO falls below this preset trigger level.
+
 ###### Code Support
 | Code | Version |
 | ---- | ------- |

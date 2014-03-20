@@ -1,5 +1,9 @@
 # Echo Cancel
 
+The echo cancel feature disables the receiver while transmitting. This is mainly used in RS485 mode when the transmit and receive lines are tied together. 
+
+_This is a board-wide (as opposed to port-by-port) setting on the Async-335 family of cards._
+
 ###### Code Support
 | Code | Version |
 | ---- | ------- |
