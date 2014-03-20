@@ -9,7 +9,7 @@ int main(void)
 
     fd = open("/dev/serialfc0", O_RDWR);
 
-    ioctl(fd, IOCTL_FASTCOM_GET_SAMPLE_RATE, &type);
+    ioctl(fd, IOCTL_FASTCOM_GET_CARD_TYPE, &type);
 
     close(fd);
 
