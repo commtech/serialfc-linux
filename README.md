@@ -172,6 +172,8 @@ int main(void)
     file_status = fcntl(fd, F_GETFL, 0);
     fcntl(fd, F_SETFL, file_status & ~O_NDELAY);
 
+    ioctl(fd, IOCTL_FASTCOM_GET_CARD_TYPE, &type);
+
     if (type == SERIALFC_CARD_TYPE_PCIE) {
         int status = 0;
 
