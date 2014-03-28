@@ -1130,7 +1130,7 @@ int fastcom_set_clock_bits_pci(struct serialfc_port *port,
 
     //Put MPIO pins back to saved state.
     iowrite8(saved, port->addr + MPIOLVL_OFFSET);
-printk("\a");
+
     return 0;
 }
 
