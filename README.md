@@ -149,8 +149,7 @@ Create a new C file (named tutorial.c) with the following code.
 #include <stdlib.h>
 #include <termios.h>
 #include <sys/ioctl.h>
-
-/* #define ASYNC_PCIE */
+#include <serialfc.h>
 
 int main(void)
 {
@@ -158,6 +157,7 @@ int main(void)
     char odata[] = "Hello world!";
     char idata[20];
     int file_status;
+    unsigned type;
     struct termios tios;
 
     /* Open port 0 (ttyS4) */
@@ -172,15 +172,13 @@ int main(void)
     file_status = fcntl(fd, F_GETFL, 0);
     fcntl(fd, F_SETFL, file_status & ~O_NDELAY);
 
-#ifdef ASYNC_PCIE
-    {
+    if (type == SERIALFC_CARD_TYPE_PCIE) {
         int status = 0;
 
         ioctl(fd, TIOCMGET, &status);
         status &= ~TIOCM_DTR; /* Set DTR to 1 (transmitter always on, 422) */
         ioctl(fd, TIOCMSET, &status);
     }
-#endif
 
 
     /* Configure serial settings */
@@ -215,7 +213,7 @@ For this example I will use the gcc compiler, but you can use your compiler of
 choice.
 
 ```
-# gcc -I ..\lib\raw\ tutorial.c
+# gcc -I ../lib/raw/ tutorial.c
 ```
 
 Now attach the included loopback connector.
