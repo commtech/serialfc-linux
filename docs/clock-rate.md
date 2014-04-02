@@ -53,4 +53,4 @@ echo 1 > /sys/class/serialfc/serialfc0/settings/clock_rate
 
 
 ### Additional Resources
-- Complete example: [`examples/clock_rate.c`](../examples/clock_rate.c)
+- Complete example: [`examples/clock-rate.c`](../examples/clock-rate.c)

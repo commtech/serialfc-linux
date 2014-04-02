@@ -108,4 +108,4 @@ echo 0 > /sys/class/serialfc/serialfc0/settings/nine_bit
 
 
 ### Additional Resources
-- Complete example: [`examples/nine_bit.c`](../examples/nine_bit.c)
+- Complete example: [`examples/nine-bit.c`](../examples/nine-bit.c)

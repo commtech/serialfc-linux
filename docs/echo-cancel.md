@@ -1,6 +1,6 @@
 # Echo Cancel
 
-The echo cancel feature disables the receiver while transmitting. This is mainly used in RS485 mode when the transmit and receive lines are tied together. 
+The echo cancel feature disables the receiver while transmitting. This is mainly used in RS485 mode when the transmit and receive lines are tied together.
 
 _This is a board-wide (as opposed to port-by-port) setting on the Async-335 family of cards._
 
@@ -95,4 +95,4 @@ echo 0 > /sys/class/serialfc/serialfc0/settings/echo_cancel
 
 
 ### Additional Resources
-- Complete example: [`examples/echo_cancel.c`](../examples/echo_cancel.c)
+- Complete example: [`examples/echo-cancel.c`](../examples/echo-cancel.c)

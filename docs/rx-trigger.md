@@ -79,4 +79,4 @@ echo 1 > /sys/class/serialfc/serialfc0/settings/rx_trigger
 
 
 ### Additional Resources
-- Complete example: [`examples/rx_trigger.c`](../examples/rx_trigger.c)
+- Complete example: [`examples/rx-trigger.c`](../examples/rx-trigger.c)

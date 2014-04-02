@@ -77,4 +77,4 @@ echo 1 > /sys/class/serialfc/serialfc0/settings/sample_rate
 
 
 ### Additional Resources
-- Complete example: [`examples/sample_rate.c`](../examples/sample_rate.c)
+- Complete example: [`examples/sample-rate.c`](../examples/sample-rate.c)

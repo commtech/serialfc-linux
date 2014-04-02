@@ -107,4 +107,4 @@ echo 0 > /sys/class/serialfc/serialfc0/settings/frame_length
 
 
 ### Additional Resources
-- Complete example: [`examples/frame_length.c`](../examples/frame_length.c)
+- Complete example: [`examples/frame-length.c`](../examples/frame-length.c)

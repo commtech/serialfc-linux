@@ -80,4 +80,4 @@ echo 1 > /sys/class/serialfc/serialfc0/settings/tx_trigger
 
 
 ### Additional Resources
-- Complete example: [`examples/tx_trigger.c`](../examples/tx_trigger.c)
+- Complete example: [`examples/tx-trigger.c`](../examples/tx-trigger.c)

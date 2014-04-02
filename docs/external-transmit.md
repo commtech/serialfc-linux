@@ -110,4 +110,4 @@ echo 0 > /sys/class/serialfc/serialfc0/settings/external_transmit
 
 
 ### Additional Resources
-- Complete example: [`examples/external_transmit.c`](../examples/external_transmit.c)
+- Complete example: [`examples/external-transmit.c`](../examples/external-transmit.c)
