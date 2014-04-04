@@ -20,9 +20,9 @@ IOCTL_FASTCOM_GET_CARD_TYPE
 
 | Card Type | Value | Description |
 | --------- | -----:| ----------- |
-| `SERIALFC_CARD_TYPE_PCI` | 0 | FSCC (16C950) |
-| `SERIALFC_CARD_TYPE_PCIE` | 1 | Async-335 (17D15X) |
-| `SERIALFC_CARD_TYPE_FSCC` | 2 | Async-PCIe (17V35X) |
+| `SERIALFC_CARD_TYPE_PCI` | 0 | Async-335 (17D15X) |
+| `SERIALFC_CARD_TYPE_PCIE` | 1 | Async-PCIe (17V35X) |
+| `SERIALFC_CARD_TYPE_FSCC` | 2 | FSCC (16C950) |
 | `SERIALFC_CARD_TYPE_UNKNOWN` | 3 | Unknown |
 
 ###### Examples
