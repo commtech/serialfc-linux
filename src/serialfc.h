@@ -100,6 +100,13 @@ enum FASTCOM_CARD_TYPE { CARD_TYPE_PCI, CARD_TYPE_PCIe, CARD_TYPE_FSCC, CARD_TYP
 /* FSCC Bar0 register set */
 #define VSTR_OFFSET 0x4c
 
+struct ioctl_get_dev_info_struct {
+      short vendor;       /* vendor ID */
+      short device;       /* device ID */
+      unsigned char bus;  /* PCI bus number */
+      unsigned char slot; /* slot number */
+};
+
 #define SERIALFC_IOCTL_MAGIC 0x19
 
 #define IOCTL_FASTCOM_ENABLE_RS485 _IO(SERIALFC_IOCTL_MAGIC, 0)
@@ -156,5 +163,7 @@ enum FASTCOM_CARD_TYPE { CARD_TYPE_PCI, CARD_TYPE_PCIe, CARD_TYPE_FSCC, CARD_TYP
 #define IOCTL_FASTCOM_DISABLE_FIXED_BAUD_RATE _IO(SERIALFC_IOCTL_MAGIC, 30)
 #define IOCTL_FASTCOM_GET_FIXED_BAUD_RATE _IOR(SERIALFC_IOCTL_MAGIC, 31, unsigned *)
 #endif
+
+#define IOCTL_FASTCOM_GET_DEV_INFO _IOR(SERIALFC_IOCTL_MAGIC, 32, struct ioctl_get_dev_info_struct *)
 
 #endif
