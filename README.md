@@ -288,6 +288,7 @@ ioctl(ttys_fd, TIOCMSET, &mode);
 
 ### Custom Baud Rates
 Using custom baud rates in Linux require a few modifications.
+
 ```
 #include <termios.h>
 #include <sys/ioctl.h>
@@ -305,11 +306,13 @@ tcsetattr(ttys_fd, TCSANOW, &tios);
 
 /* Set up our new baud base (clock frequency / sampling rate) and enable
  custom speed flag */
+int sample_rate = 16; // This is used earlier to set the sample rate.
+int baud = 7812500; // Desired baud rate.
+int clock_speed = 125000000; // This is for the 422/x-PCIe
 ioctl(ttys_fd, TIOCGSERIAL, &ss);
-
-ss.baud_base = CUSTOM_BAUD; /* Requires admin rights */
+ss.baud_base = clock_speed / sample_rate; /* Requires admin rights */
 ss.flags = (ss.flags & ~ASYNC_SPD_MASK) | ASYNC_SPD_CUST;
-ss.custom_divisor = (ss.baud_base + (CUSTOM_BAUD / 2)) / CUSTOM_BAUD;
+ss.custom_divisor = (ss.baud_base + (baud / 2)) / baud;
 
 ioctl(ttys_fd, TIOCSSERIAL, &ss);
 ```
