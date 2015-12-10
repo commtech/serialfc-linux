@@ -88,7 +88,11 @@ int fastcom_get_9bit(struct serialfc_port *port, int *enabled);
 int fastcom_enable_9bit(struct serialfc_port *port);
 int fastcom_disable_9bit(struct serialfc_port *port);
 
-int pcie_set_baud_rate(struct serialfc_port *port, unsigned value);
+int fastcom_set_baud_rate(struct serialfc_port *port, unsigned long value);
+int fastcom_get_baud_rate(struct serialfc_port *port, unsigned long* value);
+
+int pcie_set_baud_rate(struct serialfc_port *port, unsigned long value);
+int pcie_get_baud_rate(struct serialfc_port *port, unsigned long* value);
 
 enum FASTCOM_CARD_TYPE fastcom_get_card_type2(struct serialfc_card *card);
 enum FASTCOM_CARD_TYPE fastcom_get_card_type(struct serialfc_port *port);

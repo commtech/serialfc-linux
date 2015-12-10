@@ -208,6 +208,14 @@ int serialfc_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 		error_code = fastcom_get_9bit(port, (unsigned *)arg);
 		break;
 
+    case IOCTL_FASTCOM_SET_BAUD_RATE:
+      error_code = fastcom_set_baud_rate(port, arg);
+      break;
+
+    case IOCTL_FASTCOM_GET_BAUD_RATE:
+      error_code = fastcom_get_baud_rate(port, (unsigned long*)arg);
+      break;
+
 	case IOCTL_FASTCOM_ENABLE_FIXED_BAUD_RATE:
 	case IOCTL_FASTCOM_DISABLE_FIXED_BAUD_RATE:
 	case IOCTL_FASTCOM_GET_FIXED_BAUD_RATE:
