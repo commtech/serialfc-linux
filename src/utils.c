@@ -1154,8 +1154,36 @@ int fastcom_set_clock_bits(struct serialfc_port *port, void *clock_data)
     return status;
 }
 
+int fastcom_set_baud_rate(struct serialfc_port *port, unsigned long value)
+{
+   int status = 0;
+   switch (fastcom_get_card_type(port)) {
+   case CARD_TYPE_PCIe:
+       status = pcie_set_baud_rate(port, value);
+       break;
+   default:
+       status = -EPROTONOSUPPORT;
+       break;
+   }
+   return status;
+}
+
+int fastcom_get_baud_rate(struct serialfc_port *port, unsigned long *value)
+{
+   int status = 0;
+   switch (fastcom_get_card_type(port)) {
+   case CARD_TYPE_PCIe:
+       status = pcie_get_baud_rate(port, value);
+       break;
+   default:
+       status = -EPROTONOSUPPORT;
+       break;
+   }
+   return status;
+}
+
 /* Includes non floating point math from David Higgins */
-int pcie_set_baud_rate(struct serialfc_port *port, unsigned value)
+int pcie_set_baud_rate(struct serialfc_port *port, unsigned long value)
 {
     const unsigned input_freq = 125000000;
     const unsigned prescaler = 1;
@@ -1164,6 +1192,22 @@ int pcie_set_baud_rate(struct serialfc_port *port, unsigned value)
     unsigned char dlm = 0;
     unsigned char dll = 0;
     unsigned char dld = 0;
+    unsigned sample_rate = 16;
+
+    if(value < input_freq/16)
+    {//using the 16x mode
+     sample_rate = 16;
+    }
+    else if((value >= input_freq/16)&&(value < input_freq/4))
+    {//using the 8x mode
+     sample_rate = 8;
+    }
+    else
+    {//using the 4x mode
+     sample_rate = 4;
+    }
+
+    fastcom_set_sample_rate(port, sample_rate);
 
     orig_lcr = ioread8(port->addr + LCR_OFFSET);
 
@@ -1182,6 +1226,34 @@ int pcie_set_baud_rate(struct serialfc_port *port, unsigned value)
     iowrite8(dlm, port->addr + DLM_OFFSET);
     iowrite8(dll, port->addr + DLL_OFFSET);
     iowrite8(dld, port->addr + DLD_OFFSET);
+
+    iowrite8(orig_lcr, port->addr + LCR_OFFSET);
+
+    return 0;
+}
+
+int pcie_get_baud_rate(struct serialfc_port *port, unsigned long *value)
+{
+    unsigned long input_freq = 125000000;
+    const unsigned long prescaler = 1;
+    unsigned divisor_16ths = 0;
+    unsigned char orig_lcr = 0;
+    unsigned char dlm = 0;
+    unsigned char dll = 0;
+    unsigned char dld = 0;
+
+    orig_lcr = ioread8(port->addr + LCR_OFFSET);
+
+    iowrite8(orig_lcr | 0x80, port->addr + LCR_OFFSET);
+
+    dlm = ioread8(port->addr + DLM_OFFSET);
+    dll = ioread8(port->addr + DLL_OFFSET);
+    dld = ioread8(port->addr + DLD_OFFSET);
+
+    divisor_16ths = (dlm << 12) + (dll << 4) + (dld & 0xf); // in 16th ticks
+
+    input_freq <<= 4; // to remove scaling in the divisor
+    *value = (input_freq / prescaler / divisor_16ths / port->sample_rate);
 
     iowrite8(orig_lcr, port->addr + LCR_OFFSET);
 

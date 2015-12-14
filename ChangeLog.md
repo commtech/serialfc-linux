@@ -1,5 +1,8 @@
 # ChangeLog
 
+## In Development
+- Added support for getting/setting arbitrary baud rates when using RS422/X-PCIe cards.
+
 ## [2.3.0](https://github.com/commtech/serialfc-linux/releases/tag/v2.3.0) (02/13/2014)
 - Fixed 950 trigger level issue causing missing interrupts
 - Added support for setting the clock rate on 335 cards

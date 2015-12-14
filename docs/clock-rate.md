@@ -10,7 +10,7 @@
 | ----------- |:-----:|
 | FSCC (16C950) | Yes |
 | Async-335 (17D15X) | Yes |
-| Async-PCIe (17V35X) | Not required |
+| Async-PCIe (17V35X) | See [Baud Rate Documentation](baud-rate.md) |
 
 
 ###### Operating Range

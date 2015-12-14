@@ -342,6 +342,36 @@ static ssize_t clock_rate_store(struct kobject *kobj,
 	return count;
 }
 
+static ssize_t baud_rate_show(struct kobject *kobj,
+                     struct kobj_attribute *attr, char *buf)
+{
+   struct serialfc_port *port = 0;
+   unsigned long value = 0;
+
+   port = (struct serialfc_port *)dev_get_drvdata((struct device *)kobj);
+
+   fastcom_get_baud_rate(port, &value);
+
+   return sprintf(buf, "%lu\n", value);
+}
+
+static ssize_t baud_rate_store(struct kobject *kobj,
+                     struct kobj_attribute *attr, const char *buf,
+                     size_t count)
+{
+   struct serialfc_port *port = 0;
+   unsigned long value = 0;
+   char *end = 0;
+
+   port = (struct serialfc_port *)dev_get_drvdata((struct device *)kobj);
+
+   value = simple_strtoul(buf, &end, 10);
+
+   fastcom_set_baud_rate(port, value);
+
+   return count;
+}
+
 static struct kobj_attribute nine_bit_attribute =
 	__ATTR(nine_bit, SYSFS_READ_WRITE_MODE, nine_bit_show, nine_bit_store);
 
@@ -375,6 +405,9 @@ static struct kobj_attribute tx_trigger_attribute =
 static struct kobj_attribute clock_rate_attribute =
 	__ATTR(clock_rate, SYSFS_READ_MODE, NULL, clock_rate_store);
 
+static struct kobj_attribute baud_rate_attribute =
+   __ATTR(baud_rate, SYSFS_READ_WRITE_MODE, baud_rate_show, baud_rate_store);
+
 static struct attribute *settings_attrs[] = {
 	&nine_bit_attribute.attr,
 	&echo_cancel_attribute.attr,
@@ -387,6 +420,7 @@ static struct attribute *settings_attrs[] = {
 	&termination_attribute.attr,
 	&tx_trigger_attribute.attr,
 	&clock_rate_attribute.attr,
+	&baud_rate_attribute.attr,
 	NULL,
 };
 

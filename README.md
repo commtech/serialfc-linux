@@ -233,6 +233,7 @@ You have now transmitted and received an asynchronous frame!
 There are likely other configuration options you will need to set up for your
 own program. All of these options are described on their respective documentation page.
 
+- [Baud Rate](docs/baud-rate.md)
 - [Connect](docs/connect.md)
 - [Card Type](docs/card-type.md)
 - [Clock Rate](docs/clock-rate.md)
@@ -266,7 +267,7 @@ serial driver. There are a couple extra steps needed in your software to use the
 int mode = 0;
 
 ioctl(fd, TIOCMGET, &mode);
-mode &= ~TIOCM_DTR; /* Set DTR to 1 (transmitter always on, 422) */
+mode &= ~TIOCM_DTR; /* Set DTR to 0 (transmitter always on, 422) */
 ioctl(fd, TIOCMSET, &mode);
 
 // Other 422 initialization code
@@ -328,6 +329,35 @@ of 16 MHz and a sampling rate of 16.
 # setserial /dev/ttyS# divisor 1           // spd_cust will use a divisor of 1
 ```
 
+### Arbitrary baud rates
+In the case that completely arbitrary baud rates are required, and a
+fractional divisor is needed, IOCTL / sysfs is provided to set a custom baud rate.
+To set the custom baud rate, the serialfc driver must be used, instead of the
+kernel provided serial/tty.
+
+```
+#include <termios.h>
+#include <sys/ioctl.h>
+#include <linux/serial.h>
+#include <serialfc.h>
+...
+
+/* Set the speed to 38400 so that we can use the custom speed below */
+tcgetattr(ttys_fd, &tios);
+cfsetospeed(&tios, B38400);
+cfsetispeed(&tios, B38400);
+tcsetattr(ttys_fd, TCSANOW, &tios);
+
+unsigned long desired_baud = 10000000ul;
+
+ioctl(serialfc_fd, IOCTL_FASTCOM_SET_BAUD_RATE, desired_baud);
+```
+
+Note that as a side effect of setting the baud rate this way, the sampling rate
+may also be changed.
+
+Support for setting the baud rate in this way is limited. See [baud rate](docs/baud-rate.md)
+documentation for more details.
 
 ### FAQ
 

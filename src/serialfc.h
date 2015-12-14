@@ -166,4 +166,7 @@ struct ioctl_get_dev_info_struct {
 
 #define IOCTL_FASTCOM_GET_DEV_INFO _IOR(SERIALFC_IOCTL_MAGIC, 32, struct ioctl_get_dev_info_struct *)
 
+#define IOCTL_FASTCOM_GET_BAUD_RATE _IOR(SERIALFC_IOCTL_MAGIC, 33, unsigned long*)
+#define IOCTL_FASTCOM_SET_BAUD_RATE _IOW(SERIALFC_IOCTL_MAGIC, 34, unsigned long)
+
 #endif
