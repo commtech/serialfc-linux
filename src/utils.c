@@ -1192,23 +1192,10 @@ int pcie_set_baud_rate(struct serialfc_port *port, unsigned long value)
     unsigned char dlm = 0;
     unsigned char dll = 0;
     unsigned char dld = 0;
-    unsigned sample_rate = 16;
 
-    if(value < input_freq/16)
-    {//using the 16x mode
-     sample_rate = 16;
-    }
-    else if((value >= input_freq/16)&&(value < input_freq/4))
-    {//using the 8x mode
-     sample_rate = 8;
-    }
-    else
-    {//using the 4x mode
-     sample_rate = 4;
-    }
-
-    fastcom_set_sample_rate(port, sample_rate);
-
+    if(value > input_freq / port->sample_rate)
+		return -EINVAL;
+		
     orig_lcr = ioread8(port->addr + LCR_OFFSET);
 
     iowrite8(orig_lcr | 0x80, port->addr + LCR_OFFSET);
