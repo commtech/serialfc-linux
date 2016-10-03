@@ -46,6 +46,7 @@ unsigned is_serialfc_device(struct pci_dev *pdev)
 		case SFSCCe_4_ID:
 		case SFSCC_4_UA_CPCI_ID:
 		case SFSCC_4_UA_LVDS_ID:
+        case SFSCCe_4_LVDS_UA_ID:
 		case SFSCC_UA_LVDS_ID:
 		case FSCCe_4_UA_ID:
        		return 1;

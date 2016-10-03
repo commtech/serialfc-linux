@@ -138,6 +138,7 @@ struct serialfc_card *serialfc_card_new(struct pci_dev *pdev,
 	case SFSCCe_4_ID:
 	case SFSCC_4_UA_CPCI_ID:
 	case SFSCC_4_UA_LVDS_ID:
+	case SFSCCe_4_LVDS_UA_ID:
 	case SFSCC_UA_LVDS_ID:
 	case FSCCe_4_UA_ID:
 		board = &fscc_board;
@@ -265,6 +266,8 @@ char *serialfc_card_get_name(struct serialfc_card *card)
 	case SFSCC_4_LVDS_ID:
 	case SFSCC_4_UA_LVDS_ID:
 		return "SuperFSCC/4-LVDS PCI";
+	case SFSCCe_4_LVDS_UA_ID:
+		return "SuperFSCC/4-LVDS PCIe";
 	case SFSCCe_4_ID:
 		return "SuperFSCC/4 PCIe";
 	case SFSCC_4_CPCI_ID:
