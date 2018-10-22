@@ -1,7 +1,12 @@
 # ChangeLog
 
-## In Development
-- Added support for getting/setting arbitrary baud rates when using RS422/X-PCIe cards.
+## [2.3.2](https://github.com/commtech/serialfc-linux/releases/tag/v2.3.2) (10/22/2018)
+- Added copy_to/from_user to IOCTLs
+
+## [2.3.1](https://github.com/commtech/serialfc-linux/releases/tag/v2.3.1) (06/30/2017)
+- Added support of SFSCC LVDS PCIe
+- Removed automatic sampling rate change in set_baud_rate
+- Added ability to set custom baud rates on 422/X-PCIe via IOCTL and sysfs
 
 ## [2.3.0](https://github.com/commtech/serialfc-linux/releases/tag/v2.3.0) (02/13/2014)
 - Fixed 950 trigger level issue causing missing interrupts
