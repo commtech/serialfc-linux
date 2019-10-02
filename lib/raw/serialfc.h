@@ -77,6 +77,11 @@ enum card_type { SERIALFC_CARD_TYPE_PCI=0, SERIALFC_CARD_TYPE_PCIE, SERIALFC_CAR
 #define IOCTL_FASTCOM_GET_BAUD_RATE _IOR(SERIALFC_IOCTL_MAGIC, 33, unsigned long*)
 #define IOCTL_FASTCOM_SET_BAUD_RATE _IOW(SERIALFC_IOCTL_MAGIC, 34, unsigned long)
 
+/* These are only available on the idle_low_transmit branch with special firmware. */
+#define IOCTL_FASTCOM_ENABLE_IDLE_LOW _IO(SERIALFC_IOCTL_MAGIC, 35)
+#define IOCTL_FASTCOM_DISABLE_IDLE_LOW _IO(SERIALFC_IOCTL_MAGIC, 36)
+#define IOCTL_FASTCOM_GET_IDLE_LOW _IOR(SERIALFC_IOCTL_MAGIC, 37, unsigned *)
+
 #ifdef __cplusplus
 }
 #endif

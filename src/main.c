@@ -22,7 +22,7 @@
 #include <linux/pci.h> /* struct pci_dev */
 #include <linux/fs.h> /* struct file_operations */
 #include <linux/version.h>
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 
 #include "card.h"
 #include "utils.h"
@@ -242,8 +242,20 @@ int serialfc_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
     case IOCTL_FASTCOM_ENABLE_FIXED_BAUD_RATE:
     case IOCTL_FASTCOM_DISABLE_FIXED_BAUD_RATE:
     case IOCTL_FASTCOM_GET_FIXED_BAUD_RATE:
-        error_code = -EPROTONOSUPPORT;
-        break;
+               error_code = -EPROTONOSUPPORT;
+               break;
+
+    case IOCTL_FASTCOM_ENABLE_IDLE_LOW:
+               error_code = fastcom_idle_active_low(port);
+               break;
+
+    case IOCTL_FASTCOM_DISABLE_IDLE_LOW:
+               error_code = fastcom_idle_active_high(port);
+               break;
+
+    case IOCTL_FASTCOM_GET_IDLE_LOW:
+               error_code = fastcom_get_idle_active_low(port, (unsigned *)arg);
+               break;
 
     case IOCTL_FASTCOM_GET_DEV_INFO:
             /* gather device data and pass back to user */
