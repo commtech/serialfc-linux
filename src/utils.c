@@ -1598,9 +1598,12 @@ void fastcom_get_idle_active_low_fscc(struct serialfc_port *port, int *enabled)
     iowrite8(CKA_OFFSET, port->addr + SPR_OFFSET);
     orig_cka = ioread8(port->addr + ICR_OFFSET);
 
+    iowrite8(ACR_OFFSET, port->addr + SPR_OFFSET);
     iowrite8(port->ACR, port->addr + ICR_OFFSET);  /* Restore original ACR value */
+
     iowrite8(orig_lcr, port->addr + LCR_OFFSET); /* Ensure last LCR value is not 0xbf */
-    *enabled = (orig_cka & 0x10) ? 1 : 0;
+
+    *enabled = (orig_cka & 0x20) ? 1 : 0;
 }
 
 void fastcom_set_idle_active_low_fscc(struct serialfc_port *port, int enable)
@@ -1614,12 +1617,17 @@ void fastcom_set_idle_active_low_fscc(struct serialfc_port *port, int enable)
     iowrite8(port->ACR | 0x40,  port->addr + ICR_OFFSET);
 
     iowrite8(CKA_OFFSET, port->addr + SPR_OFFSET);
-    orig_cka = ioread8(port->addr + ICR_OFFSET);
-    if(enable) orig_cka = orig_cka | 0x10;
-    else orig_cka = orig_cka & 0xEF;
+    orig_cka = ioread8(port->addr + ICR_OFFSET); /* Get the CKA value */
+
+    iowrite8(ACR_OFFSET, port->addr + SPR_OFFSET);
+    iowrite8(port->ACR, port->addr + ICR_OFFSET);  /* Restore original ACR value */
+
+    if(enable) orig_cka = orig_cka | 0x20;
+    else orig_cka = orig_cka & 0xDF;
+
+    iowrite8(CKA_OFFSET, port->addr + SPR_OFFSET);
     iowrite8(orig_cka, port->addr + ICR_OFFSET);
 
-    iowrite8(port->ACR, port->addr + ICR_OFFSET);  /* Restore original ACR value */
     iowrite8(orig_lcr, port->addr + LCR_OFFSET); /* Ensure last LCR value is not 0xbf */
 }
 
@@ -1627,7 +1635,7 @@ void fastcom_set_idle_active_low_fscc(struct serialfc_port *port, int enable)
 int fastcom_set_idle_active_low(struct serialfc_port *port, int enable)
 {
     int status;
-
+	
     switch(fastcom_get_card_type(port)) {
     case CARD_TYPE_FSCC:
         fastcom_set_idle_active_low_fscc(port, enable);
@@ -1645,6 +1653,7 @@ int fastcom_set_idle_active_low(struct serialfc_port *port, int enable)
 
 int fastcom_get_idle_active_low(struct serialfc_port *port, int *enabled)
 {
+
     switch(fastcom_get_card_type(port)) {
     case CARD_TYPE_FSCC:
         fastcom_get_idle_active_low_fscc(port, enabled);

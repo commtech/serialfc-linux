@@ -239,22 +239,23 @@ int serialfc_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 		copy_to_user((unsigned *)arg, &baud_rate, sizeof(tmp));
 		break;
 
+    case IOCTL_FASTCOM_ENABLE_IDLE_LOW:
+		error_code = fastcom_idle_active_low(port);
+		break;
+
+    case IOCTL_FASTCOM_DISABLE_IDLE_LOW:
+		error_code = fastcom_idle_active_high(port);
+		break;
+
+    case IOCTL_FASTCOM_GET_IDLE_LOW:
+		error_code = fastcom_get_idle_active_low(port, &tmp);
+		copy_to_user((unsigned *)arg, &tmp, sizeof(tmp));
+		break;
+
     case IOCTL_FASTCOM_ENABLE_FIXED_BAUD_RATE:
     case IOCTL_FASTCOM_DISABLE_FIXED_BAUD_RATE:
     case IOCTL_FASTCOM_GET_FIXED_BAUD_RATE:
                error_code = -EPROTONOSUPPORT;
-               break;
-
-    case IOCTL_FASTCOM_ENABLE_IDLE_LOW:
-               error_code = fastcom_idle_active_low(port);
-               break;
-
-    case IOCTL_FASTCOM_DISABLE_IDLE_LOW:
-               error_code = fastcom_idle_active_high(port);
-               break;
-
-    case IOCTL_FASTCOM_GET_IDLE_LOW:
-               error_code = fastcom_get_idle_active_low(port, (unsigned *)arg);
                break;
 
     case IOCTL_FASTCOM_GET_DEV_INFO:
@@ -278,7 +279,6 @@ int serialfc_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 		dev_dbg(port->device, "unknown ioctl 0x%x\n", cmd);
 		return -ENOTTY;
 	}
-
 	return error_code;
 }
 
