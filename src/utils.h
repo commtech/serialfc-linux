@@ -109,11 +109,4 @@ __u8 fscc_get_FREV(struct serialfc_port *port);
 __u8 fscc_get_PREV(struct serialfc_port *port);
 __u16 fscc_get_PDEV(struct serialfc_port *port);
 
-void fastcom_set_idle_active_low_fscc(struct serialfc_port *port, int enable);
-void fastcom_get_idle_active_low_fscc(struct serialfc_port *port, int *enabled);
-int fastcom_set_idle_active_low(struct serialfc_port *port, int enable);
-int fastcom_get_idle_active_low(struct serialfc_port *port, int *enabled);
-int fastcom_idle_active_high(struct serialfc_port *port);
-int fastcom_idle_active_low(struct serialfc_port *port);
-
 #endif

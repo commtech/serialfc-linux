@@ -94,7 +94,6 @@ enum FASTCOM_CARD_TYPE { CARD_TYPE_PCI, CARD_TYPE_PCIe, CARD_TYPE_FSCC, CARD_TYP
 #define CKS_OFFSET 0x03
 #define RTL_OFFSET 0x05
 #define MDM_OFFSET 0x0e
-#define CKA_OFFSET 0x13
 #define EXT_OFFSET 0x16
 #define EXTH_OFFSET 0x17
 #define FLR_OFFSET 0x20
@@ -170,10 +169,5 @@ struct ioctl_get_dev_info_struct {
 
 #define IOCTL_FASTCOM_GET_BAUD_RATE _IOR(SERIALFC_IOCTL_MAGIC, 33, unsigned long*)
 #define IOCTL_FASTCOM_SET_BAUD_RATE _IOW(SERIALFC_IOCTL_MAGIC, 34, unsigned long)
-
-/* These are only available on the idle_low_transmit branch with special firmware. */
-#define IOCTL_FASTCOM_ENABLE_IDLE_LOW _IO(SERIALFC_IOCTL_MAGIC, 35)
-#define IOCTL_FASTCOM_DISABLE_IDLE_LOW _IO(SERIALFC_IOCTL_MAGIC, 36)
-#define IOCTL_FASTCOM_GET_IDLE_LOW _IOR(SERIALFC_IOCTL_MAGIC, 37, unsigned *)
 
 #endif
