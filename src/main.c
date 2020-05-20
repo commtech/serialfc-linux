@@ -430,5 +430,7 @@ MODULE_PARM_DESC(fscc_enable_async,
     "Enable asynchronous mode on FSCC cards when loaded (removes fscc-linux " \
     "requirement).");
 
+MODULE_ALIAS("pci:v000018F7d00000021sv00000000sd00000000bc*sc*i*");
+
 module_init(serialfc_init);
 module_exit(serialfc_exit);
