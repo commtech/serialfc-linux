@@ -9,7 +9,7 @@ ifeq ($(DEBUG),1)
 endif
 
 default:
-	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules
+	$(MAKE) -C $(KDIR) M=$(shell pwd) modules
 
 install:
 	cp serialfc.rules /etc/udev/rules.d/
