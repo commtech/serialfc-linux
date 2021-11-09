@@ -8,7 +8,7 @@
 
 int main(void)
 {
-    int fd = 0;
+    int fd = 0, serialfc_fd = 0;
     char odata[] = "Hello world!";
     char idata[20];
     int file_status;
@@ -17,18 +17,23 @@ int main(void)
 
     /* Open port 0 (ttyS4) */
     fd = open("/dev/ttyS4", O_RDWR | O_NDELAY);
-
     if (fd == -1) {
         perror("open");
         return EXIT_FAILURE;
     }
-
+    
+    serialfc_fd = open("/dev/serialfc0", O_RDWR);
+    if (serialfc_fd == -1) {
+        perror("open");
+        close(fd);
+        return EXIT_FAILURE;
+    }
+    
     /* Turn off O_NDELAY now that we have the port open */
     file_status = fcntl(fd, F_GETFL, 0);
     fcntl(fd, F_SETFL, file_status & ~O_NDELAY);
 
-    ioctl(fd, IOCTL_FASTCOM_GET_CARD_TYPE, &type);
-
+    ioctl(serialfc_fd, IOCTL_FASTCOM_GET_CARD_TYPE, &type);
     if (type == SERIALFC_CARD_TYPE_PCIE) {
         int status = 0;
 
