@@ -22,7 +22,7 @@
 #include <linux/pci.h> /* struct pci_dev */
 #include <linux/fs.h> /* struct file_operations */
 #include <linux/version.h>
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 
 #include "card.h"
 #include "utils.h"
@@ -93,159 +93,174 @@ int serialfc_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 	unsigned int tmp=0;
 	long unsigned int baud_rate=0;
 	unsigned int clock_rate=0;
+	int copy_success = 0;
+
 	port = file->private_data;
 
 	switch (cmd) {
-    case IOCTL_FASTCOM_ENABLE_RS485:
+	case IOCTL_FASTCOM_ENABLE_RS485:
 		fastcom_enable_rs485(port);
 		break;
 
-    case IOCTL_FASTCOM_DISABLE_RS485:
+	case IOCTL_FASTCOM_DISABLE_RS485:
 		fastcom_disable_rs485(port);
 		break;
 
-    case IOCTL_FASTCOM_GET_RS485:
+	case IOCTL_FASTCOM_GET_RS485:
 		error_code = fastcom_get_rs485(port, &tmp);
-		copy_to_user((unsigned *)arg, &tmp, sizeof(tmp));
+		copy_success = copy_to_user((unsigned *)arg, &tmp, sizeof(tmp));
+		if(copy_success) dev_dbg(port->device, "IOCTL_FASTCOM_GET_RS485 copy_to_user() failed with %d\n", copy_success);
 		break;
 
-    case IOCTL_FASTCOM_ENABLE_ECHO_CANCEL:
+	case IOCTL_FASTCOM_ENABLE_ECHO_CANCEL:
 		fastcom_enable_echo_cancel(port);
 		break;
 
-    case IOCTL_FASTCOM_DISABLE_ECHO_CANCEL:
+	case IOCTL_FASTCOM_DISABLE_ECHO_CANCEL:
 		fastcom_disable_echo_cancel(port);
 		break;
 
-    case IOCTL_FASTCOM_GET_ECHO_CANCEL:
+	case IOCTL_FASTCOM_GET_ECHO_CANCEL:
 		fastcom_get_echo_cancel(port, &tmp);
-		copy_to_user((unsigned *)arg, &tmp, sizeof(tmp));
+		copy_success = copy_to_user((unsigned *)arg, &tmp, sizeof(tmp));
+		if(copy_success) dev_dbg(port->device, "IOCTL_FASTCOM_GET_ECHO_CANCEL copy_to_user() failed with %d\n", copy_success);
 		break;
 
-    case IOCTL_FASTCOM_ENABLE_TERMINATION:
+	case IOCTL_FASTCOM_ENABLE_TERMINATION:
 		error_code = fastcom_enable_termination(port);
 		break;
 
-    case IOCTL_FASTCOM_DISABLE_TERMINATION:
+	case IOCTL_FASTCOM_DISABLE_TERMINATION:
 		error_code = fastcom_disable_termination(port);
 		break;
 
-    case IOCTL_FASTCOM_GET_TERMINATION:
+	case IOCTL_FASTCOM_GET_TERMINATION:
 		error_code = fastcom_get_termination(port, &tmp);
-		copy_to_user((unsigned *)arg, &tmp, sizeof(tmp));
+		copy_success = copy_to_user((unsigned *)arg, &tmp, sizeof(tmp));
+		if(copy_success) dev_dbg(port->device, "IOCTL_FASTCOM_GET_TERMINATION copy_to_user() failed with %d\n", copy_success);
 		break;
 
-    case IOCTL_FASTCOM_SET_SAMPLE_RATE:
-		copy_from_user(&tmp, (unsigned *)arg, sizeof(tmp));
+	case IOCTL_FASTCOM_SET_SAMPLE_RATE:
+		tmp = (unsigned int)arg;
 		error_code = fastcom_set_sample_rate(port, tmp);
 		break;
 
-    case IOCTL_FASTCOM_GET_SAMPLE_RATE:
+	case IOCTL_FASTCOM_GET_SAMPLE_RATE:
 		fastcom_get_sample_rate(port, &tmp);
-		copy_to_user((unsigned *)arg, &tmp, sizeof(tmp));
+		copy_success = copy_to_user((unsigned *)arg, &tmp, sizeof(tmp));
+		if(copy_success) dev_dbg(port->device, "IOCTL_FASTCOM_GET_SAMPLE_RATE copy_to_user() failed with %d\n", copy_success);
 		break;
 
-    case IOCTL_FASTCOM_SET_TX_TRIGGER:
-		copy_from_user(&tmp, (unsigned *)arg, sizeof(tmp));
+	case IOCTL_FASTCOM_SET_TX_TRIGGER:
+		tmp = (unsigned int)arg;
 		error_code = fastcom_set_tx_trigger(port, tmp);
 		break;
 
-    case IOCTL_FASTCOM_GET_TX_TRIGGER:
+	case IOCTL_FASTCOM_GET_TX_TRIGGER:
 		error_code = fastcom_get_tx_trigger(port, &tmp);
-		copy_to_user((unsigned *)arg, &tmp, sizeof(tmp));
+		copy_success = copy_to_user((unsigned *)arg, &tmp, sizeof(tmp));
+		if(copy_success) dev_dbg(port->device, "IOCTL_FASTCOM_GET_TX_TRIGGER copy_to_user() failed with %d\n", copy_success);
 		break;
 
-    case IOCTL_FASTCOM_SET_RX_TRIGGER:
-		copy_from_user(&tmp, (unsigned *)arg, sizeof(tmp));
+	case IOCTL_FASTCOM_SET_RX_TRIGGER:
+		tmp = (unsigned int)arg;
 		error_code = fastcom_set_rx_trigger(port, tmp);
 		break;
 
-    case IOCTL_FASTCOM_GET_RX_TRIGGER:
+	case IOCTL_FASTCOM_GET_RX_TRIGGER:
 		error_code = fastcom_get_rx_trigger(port, &tmp);
-		copy_to_user((unsigned *)arg, &tmp, sizeof(tmp));
+		copy_success = copy_to_user((unsigned *)arg, &tmp, sizeof(tmp));
+		if(copy_success) dev_dbg(port->device, "IOCTL_FASTCOM_GET_RX_TRIGGER copy_to_user() failed with %d\n", copy_success);
 		break;
 
-    case IOCTL_FASTCOM_SET_CLOCK_RATE:
-		copy_from_user(&clock_rate, (unsigned *)arg, sizeof(clock_rate));
+	case IOCTL_FASTCOM_SET_CLOCK_RATE:
+		tmp = (unsigned int)arg;
 		error_code = fastcom_set_clock_rate(port, clock_rate);
 		break;
 
-    case IOCTL_FASTCOM_SET_CLOCK_BITS:
-		copy_from_user(clock_bits, (char *)arg, 20);
+	case IOCTL_FASTCOM_SET_CLOCK_BITS:
+		copy_success = copy_from_user(clock_bits, (char *)arg, 20);
+		if(copy_success) dev_dbg(port->device, "IOCTL_FASTCOM_SET_CLOCK_BITS copy_from_user() failed with %d\n", copy_success);
 		error_code = fastcom_set_clock_bits(port, clock_bits);
 		break;
 
-    case IOCTL_FASTCOM_ENABLE_ISOCHRONOUS:
+	case IOCTL_FASTCOM_ENABLE_ISOCHRONOUS:
 		error_code = fastcom_enable_isochronous(port, (unsigned)arg);
 		break;
 
-    case IOCTL_FASTCOM_DISABLE_ISOCHRONOUS:
+	case IOCTL_FASTCOM_DISABLE_ISOCHRONOUS:
 		error_code = fastcom_disable_isochronous(port);
 		break;
 
-    case IOCTL_FASTCOM_GET_ISOCHRONOUS:
+	case IOCTL_FASTCOM_GET_ISOCHRONOUS:
 		error_code = fastcom_get_isochronous(port, &tmp);
-		copy_to_user((unsigned *)arg, &tmp, sizeof(tmp));
+		copy_success = copy_to_user((unsigned *)arg, &tmp, sizeof(tmp));
+		if(copy_success) dev_dbg(port->device, "IOCTL_FASTCOM_GET_ISOCHRONOUS copy_to_user() failed with %d\n", copy_success);
 		break;
 
-    case IOCTL_FASTCOM_ENABLE_EXTERNAL_TRANSMIT:
+	case IOCTL_FASTCOM_ENABLE_EXTERNAL_TRANSMIT:
 		error_code = fastcom_enable_external_transmit(port, (unsigned)arg);
 		break;
 
-    case IOCTL_FASTCOM_DISABLE_EXTERNAL_TRANSMIT:
+	case IOCTL_FASTCOM_DISABLE_EXTERNAL_TRANSMIT:
 		error_code = fastcom_disable_external_transmit(port);
 		break;
 
-    case IOCTL_FASTCOM_GET_EXTERNAL_TRANSMIT:
+	case IOCTL_FASTCOM_GET_EXTERNAL_TRANSMIT:
 		error_code = fastcom_get_external_transmit(port, &tmp);
-		copy_to_user((unsigned *)arg, &tmp, sizeof(tmp));
+		copy_success = copy_to_user((unsigned *)arg, &tmp, sizeof(tmp));
+		if(copy_success) dev_dbg(port->device, "IOCTL_FASTCOM_GET_EXTERNAL_TRANSMIT copy_to_user() failed with %d\n", copy_success);
 		break;
 
-    case IOCTL_FASTCOM_SET_FRAME_LENGTH:
-		copy_from_user(&tmp, (unsigned *)arg, sizeof(tmp));
+	case IOCTL_FASTCOM_SET_FRAME_LENGTH:
+		tmp = (unsigned int)arg;
 		error_code = fastcom_set_frame_length(port, tmp);
 		break;
 
-    case IOCTL_FASTCOM_GET_FRAME_LENGTH:
+	case IOCTL_FASTCOM_GET_FRAME_LENGTH:
 		error_code = fastcom_get_frame_length(port, &tmp);
-		copy_to_user((unsigned *)arg, &tmp, sizeof(tmp));
+		copy_success = copy_to_user((unsigned *)arg, &tmp, sizeof(tmp));
+		if(copy_success) dev_dbg(port->device, "IOCTL_FASTCOM_GET_FRAME_LENGTH copy_to_user() failed with %d\n", copy_success);
 		break;
 
-    case IOCTL_FASTCOM_GET_CARD_TYPE:
+	case IOCTL_FASTCOM_GET_CARD_TYPE:
 		tmp = fastcom_get_card_type(port);
-		copy_to_user((unsigned *)arg, &tmp, sizeof(tmp));
+		copy_success = copy_to_user((unsigned *)arg, &tmp, sizeof(tmp));
+		if(copy_success) dev_dbg(port->device, "IOCTL_FASTCOM_GET_CARD_TYPE copy_to_user() failed with %d\n", copy_success);
 		break;
 
-    case IOCTL_FASTCOM_ENABLE_9BIT:
+	case IOCTL_FASTCOM_ENABLE_9BIT:
 		error_code = fastcom_enable_9bit(port);
 		break;
 
-    case IOCTL_FASTCOM_DISABLE_9BIT:
+	case IOCTL_FASTCOM_DISABLE_9BIT:
 		error_code = fastcom_disable_9bit(port);
 		break;
 
-    case IOCTL_FASTCOM_GET_9BIT:
+	case IOCTL_FASTCOM_GET_9BIT:
 		error_code = fastcom_get_9bit(port, &tmp);
-		copy_to_user((unsigned *)arg, &tmp, sizeof(tmp));
+		copy_success = copy_to_user((unsigned *)arg, &tmp, sizeof(tmp));
+		if(copy_success) dev_dbg(port->device, "IOCTL_FASTCOM_GET_9BIT copy_to_user() failed with %d\n", copy_success);
 		break;
 
-    case IOCTL_FASTCOM_SET_BAUD_RATE:
-		copy_from_user(&baud_rate, (unsigned *)arg, sizeof(baud_rate));
+	case IOCTL_FASTCOM_SET_BAUD_RATE:
+		tmp = (unsigned int)arg;
 		error_code = fastcom_set_baud_rate(port, baud_rate);
 		break;
 
-    case IOCTL_FASTCOM_GET_BAUD_RATE:
+	case IOCTL_FASTCOM_GET_BAUD_RATE:
 		error_code = fastcom_get_baud_rate(port, &baud_rate);
-		copy_to_user((unsigned *)arg, &baud_rate, sizeof(tmp));
+		copy_success = copy_to_user((unsigned *)arg, &baud_rate, sizeof(tmp));
+		if(copy_success) dev_dbg(port->device, "IOCTL_FASTCOM_GET_BAUD_RATE copy_to_user() failed with %d\n", copy_success);
 		break;
 
-    case IOCTL_FASTCOM_ENABLE_FIXED_BAUD_RATE:
-    case IOCTL_FASTCOM_DISABLE_FIXED_BAUD_RATE:
-    case IOCTL_FASTCOM_GET_FIXED_BAUD_RATE:
-        error_code = -EPROTONOSUPPORT;
-        break;
+	case IOCTL_FASTCOM_ENABLE_FIXED_BAUD_RATE:
+	case IOCTL_FASTCOM_DISABLE_FIXED_BAUD_RATE:
+	case IOCTL_FASTCOM_GET_FIXED_BAUD_RATE:
+		error_code = -EPROTONOSUPPORT;
+		break;
 
-    case IOCTL_FASTCOM_GET_DEV_INFO:
+	case IOCTL_FASTCOM_GET_DEV_INFO:
             /* gather device data and pass back to user */
             l_dev_data.vendor = port->card->pci_dev->vendor;
             l_dev_data.device = port->card->pci_dev->device;
@@ -322,7 +337,7 @@ struct pci_driver serialfc_pci_driver = {
 
 static int __init serialfc_init(void)
 {
-	unsigned error_code = 0;
+	int error_code = 0;
 
 	serialfc_class = class_create(THIS_MODULE, DEVICE_NAME);
 
