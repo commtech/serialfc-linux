@@ -174,7 +174,7 @@ int serialfc_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 		break;
 
 	case IOCTL_FASTCOM_SET_CLOCK_RATE:
-		tmp = (unsigned int)arg;
+		clock_rate = (unsigned int)arg;
 		error_code = fastcom_set_clock_rate(port, clock_rate);
 		break;
 
