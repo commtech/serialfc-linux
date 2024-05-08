@@ -130,8 +130,8 @@ struct serialfc_port *serialfc_port_new(struct serialfc_card *card, unsigned cha
     fastcom_set_isochronous(port, DEFAULT_ISOCHRONOUS);
     fastcom_set_frame_length(port, DEFAULT_FRAME_LENGTH);
 
-    if (fscc_enable_async && fastcom_get_card_type(port) == CARD_TYPE_FSCC)
-        fscc_enable_async_mode(port);
+	if (fscc_enable_async && fastcom_get_card_type(port) == CARD_TYPE_FSCC)
+		fscc_enable_async_mode(port);
 
 	cdev_init(&port->cdev, fops);
 	port->cdev.owner = THIS_MODULE;
