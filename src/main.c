@@ -244,7 +244,7 @@ int serialfc_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 		break;
 
 	case IOCTL_FASTCOM_SET_BAUD_RATE:
-		tmp = (unsigned int)arg;
+		baud_rate = arg;
 		error_code = fastcom_set_baud_rate(port, baud_rate);
 		break;
 
