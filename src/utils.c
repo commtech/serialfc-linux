@@ -23,6 +23,51 @@
 #include "port.h"
 #include "config.h"
 
+int fastcom_set_sample_rate_pci(struct serialfc_port *port, unsigned value);
+int fastcom_set_sample_rate_pcie(struct serialfc_port *port, unsigned value);
+int fastcom_set_sample_rate_fscc(struct serialfc_port *port, unsigned value);
+
+int fastcom_set_tx_trigger_pci(struct serialfc_port *port, unsigned value);
+int fastcom_set_tx_trigger_pcie(struct serialfc_port *port, unsigned value);
+int fastcom_set_tx_trigger_fscc(struct serialfc_port *port, unsigned value);
+
+int fastcom_set_rx_trigger_pci(struct serialfc_port *port, unsigned value);
+int fastcom_set_rx_trigger_pcie(struct serialfc_port *port, unsigned value);
+int fastcom_set_rx_trigger_fscc(struct serialfc_port *port, unsigned value);
+
+void fastcom_get_tx_trigger_fscc(struct serialfc_port *port, unsigned *value);
+void fastcom_get_rx_trigger_fscc(struct serialfc_port *port, unsigned *value);
+
+void fastcom_set_rs485_pci(struct serialfc_port *port, int enable);
+void fastcom_set_rs485_pcie(struct serialfc_port *port, int enable);
+void fastcom_set_rs485_fscc(struct serialfc_port *port, int enable);
+
+void fastcom_get_rs485_pci(struct serialfc_port *port, int *enabled);
+void fastcom_get_rs485_fscc(struct serialfc_port *port, int *enabled);
+
+int fastcom_set_isochronous_fscc(struct serialfc_port *port, int mode);
+void fastcom_get_isochronous_fscc(struct serialfc_port *port, int *mode);
+
+void fastcom_set_termination_pcie(struct serialfc_port *port, int enable);
+void fastcom_get_termination_pcie(struct serialfc_port *port, int *enable);
+
+void fastcom_set_echo_cancel_pci(struct serialfc_port *port, int enable);
+void fastcom_set_echo_cancel_pcie(struct serialfc_port *port, int enable);
+void fastcom_set_echo_cancel_fscc(struct serialfc_port *port, int enable);
+
+void fastcom_get_echo_cancel_pci(struct serialfc_port *port, int *enabled);
+void fastcom_get_echo_cancel_pcie(struct serialfc_port *port, int *enabled);
+void fastcom_get_echo_cancel_fscc(struct serialfc_port *port, int *enabled);
+
+int fastcom_set_clock_bits_fscc(struct serialfc_port *port, unsigned char *clock_data);
+int fastcom_set_clock_bits_pci(struct serialfc_port *port, __u32 clock_data);
+
+int fastcom_set_external_transmit_fscc(struct serialfc_port *port, unsigned num_chars);
+void fastcom_get_external_transmit_fscc(struct serialfc_port *port, unsigned *num_chars);
+
+int fastcom_set_frame_length_fscc(struct serialfc_port *port, unsigned num_chars);
+int fastcom_get_frame_length_fscc(struct serialfc_port *port, unsigned *num_chars);
+
 unsigned is_serialfc_device(struct pci_dev *pdev)
 {
 	switch (pdev->device) {

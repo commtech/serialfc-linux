@@ -37,6 +37,13 @@ unsigned fscc_enable_async = DEFAULT_FSCC_ASYNC_MODE;
 
 struct serialfc_card *serialfc_card_find(struct pci_dev *pdev,
                                          struct list_head *card_list);
+int serialfc_open(struct inode *inode, struct file *file);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 11)
+long serialfc_ioctl(struct file *file, unsigned int cmd, unsigned long arg);
+#else
+int serialfc_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
+			       unsigned long arg);
+#endif
 
 LIST_HEAD(serialfc_cards);
 
@@ -339,7 +346,11 @@ static int __init serialfc_init(void)
 {
 	int error_code = 0;
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 2, 13)
+	serialfc_class = class_create(DEVICE_NAME);
+#else
 	serialfc_class = class_create(THIS_MODULE, DEVICE_NAME);
+#endif
 
 	if (IS_ERR(serialfc_class)) {
 		printk(KERN_ERR DEVICE_NAME " class_create failed\n");
