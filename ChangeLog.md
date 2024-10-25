@@ -1,5 +1,9 @@
 # ChangeLog
 
+## [2.3.3](https://github.com/commtech/serialfc-linux/releases/tag/v2.3.3) (10/25/2024)
+- Fixed the makefile for newer kernels
+- Suppressed some warnings
+
 ## [2.3.2](https://github.com/commtech/serialfc-linux/releases/tag/v2.3.2) (10/22/2018)
 - Added copy_to/from_user to IOCTLs
 
