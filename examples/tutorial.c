@@ -51,7 +51,7 @@ int main(void)
     tios.c_cflag = CS8 | CREAD | CLOCAL;
     tios.c_lflag &= ~(ICANON | ISIG | ECHO);
 
-    cfsetospeed(&tios, B921600);
+    cfsetospeed(&tios, B115200);
     cfsetispeed(&tios, 0); /* Set ispeed = ospeed */
 
     tcsetattr(fd, TCSANOW, &tios);
