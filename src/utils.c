@@ -59,9 +59,6 @@ void fastcom_get_echo_cancel_pci(struct serialfc_port *port, int *enabled);
 void fastcom_get_echo_cancel_pcie(struct serialfc_port *port, int *enabled);
 void fastcom_get_echo_cancel_fscc(struct serialfc_port *port, int *enabled);
 
-int fastcom_set_clock_bits_fscc(struct serialfc_port *port, unsigned char *clock_data);
-int fastcom_set_clock_bits_pci(struct serialfc_port *port, __u32 clock_data);
-
 int fastcom_set_external_transmit_fscc(struct serialfc_port *port, unsigned num_chars);
 void fastcom_get_external_transmit_fscc(struct serialfc_port *port, unsigned *num_chars);
 

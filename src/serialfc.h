@@ -75,6 +75,13 @@
 
 enum FASTCOM_CARD_TYPE { CARD_TYPE_PCI, CARD_TYPE_PCIe, CARD_TYPE_FSCC, CARD_TYPE_UNKNOWN };
 
+
+#define PCI_29MHZ_BITS 0x100801
+#define FSCC_18MHZ_BITS                                      \
+{                                                                            \
+    0x0f, 0x61, 0xe5, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18,    \
+        0x16, 0x40, 0x01, 0x04, 0x00, 0xff, 0xff, 0xff                         \
+}
 /* Normal registers */
 #define FCR_OFFSET 0x2
 #define LCR_OFFSET 0x3

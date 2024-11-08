@@ -36,7 +36,6 @@ struct serialfc_port *serialfc_port_new(struct serialfc_card *card, unsigned cha
 							struct file_operations *fops)
 {
 	struct serialfc_port *port = 0;
-	unsigned default_clock_rate = 1843200;
 
 	port = kmalloc(sizeof(*port), GFP_KERNEL);
 
@@ -102,25 +101,19 @@ struct serialfc_port *serialfc_port_new(struct serialfc_card *card, unsigned cha
 	port->channel = channel;
 	port->card = card;
 	port->addr = addr;
-
-    switch (fastcom_get_card_type(port)) {
-    case CARD_TYPE_PCI:
-    case CARD_TYPE_FSCC:
-        default_clock_rate = 18432000;
-        break;
-
-    case CARD_TYPE_PCIe:
-        default_clock_rate = 125000000;
-        break;
-
-    default:
-        default_clock_rate = 1843200;
-    }
-
+	
     fastcom_init_gpio(port);
     fastcom_init_triggers(port);
+    
+    switch (fastcom_get_card_type(port)) {
+    case CARD_TYPE_PCI:
+    	unsigned long default_pci_bits = PCI_29MHZ_BITS;
+    	fastcom_set_clock_bits_pci(port, default_pci_bits);
+    	break;
+    default:
+        break;
+    }
 
-    fastcom_set_clock_rate(port, default_clock_rate);
     fastcom_set_rs485(port, DEFAULT_RS485);
     fastcom_set_sample_rate(port, DEFAULT_SAMPLE_RATE);
     fastcom_set_tx_trigger(port, DEFAULT_TX_TRIGGER_LEVEL);
